@@ -101,6 +101,11 @@ form {
   margin: 0;
 }
 
+form > div:last-of-type,
+form > button:last-child {
+  margin-top: 10px;
+}
+
 label {
   font-weight: 600;
 }
