@@ -31,7 +31,7 @@ use App\Models\Task;
                 <td><?= (int) $task->id ?></td>
                 <td><?= htmlspecialchars($task->title, ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= $task->isDone ? 'Concluída' : 'Pendente' ?></td>
-                <td><?= htmlspecialchars($task->createdAt, ENT_QUOTES, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars($task->data_criacao, ENT_QUOTES, 'UTF-8') ?></td>
                 <td>
                     <span class="actions">
                         <a href="/tasks/<?= (int) $task->id ?>/edit">Editar</a>

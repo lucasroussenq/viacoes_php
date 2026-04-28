@@ -11,10 +11,10 @@ final class Task
     public function __construct(
         public int $id,
         public string $title,
-        public ?string $description,
+        public ?string $cidade,
         public bool $isDone,
-        public string $createdAt,
-        public ?string $updatedAt,
+        public string $data_criacao,
+        public ?string $data_atualizacao,
     ) {
     }
 
@@ -24,10 +24,10 @@ final class Task
         return new self(
             id: (int) $row['id'],
             title: (string) $row['title'],
-            description: $row['description'] !== null ? (string) $row['description'] : null,
+            cidade: $row['cidade'] !== null ? (string) $row['cidade'] : null,
             isDone: ((int) $row['is_done']) === 1,
-            createdAt: (string) $row['created_at'],
-            updatedAt: $row['updated_at'] !== null ? (string) $row['updated_at'] : null,
+            data_criacao: (string) $row['created_at'],
+            data_atualizacao: $row['updated_at'] !== null ? (string) $row['updated_at'] : null,
         );
     }
 }

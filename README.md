@@ -148,7 +148,7 @@ Exemplo de resposta:
 		{
 			"id": 1,
 			"title": "Estudar roteamento",
-			"description": "Implementar um Router simples (GET/POST + params).",
+			"cidade": "Implementar um Router simples (GET/POST + params).",
 			"is_done": false,
 			"created_at": "2026-04-23 10:00:00",
 			"updated_at": null

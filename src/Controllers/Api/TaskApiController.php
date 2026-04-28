@@ -58,10 +58,10 @@ final class TaskApiController
         return [
             'id' => $task->id,
             'title' => $task->title,
-            'description' => $task->description,
+            'cidade' => $task->cidade,
             'is_done' => $task->isDone,
-            'created_at' => $task->createdAt,
-            'updated_at' => $task->updatedAt,
+            'created_at' => $task->data_criacao,
+            'updated_at' => $task->data_atualizacao,
         ];
     }
 

@@ -2,51 +2,47 @@
 
 declare(strict_types=1);
 
-use App\Models\CoffeeBrands;
+use App\Models\viacoes;
 
-/** @var CoffeeBrands $marca */
-/** @var list<string> $errors */
-/** @var array{brand: string, description: string, is_imported: bool} $old */
+/** @var list<Coffeeviacoes> $viacoes */
 
 ?>
 
-<h1>Editar marca #<?= (int) $marca->id ?></h1>
+<h1>Marcas</h1>
 
-<?php if ($errors !== []): ?>
-    <div class="alert alert--danger">
-        <p><strong>Corrija os erros:</strong></p>
-        <ul>
-            <?php foreach ($errors as $error): ?>
-                <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></li>
-            <?php endforeach; ?>
-        </ul>
-    </div>
+<p><a href="/viacoes/create">Criar marca</a></p>
+
+<?php if (count($viacoes) === 0): ?>
+    <p>Nenhuma marca cadastrada.</p>
+<?php else: ?>
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Nacionalidade</th>
+            <th>Criada em</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($viacoes as $nome): ?>
+            <tr>
+                <td><?= (int) $nome->id ?></td>
+                <td><?= htmlspecialchars($nome->nome, ENT_QUOTES, 'UTF-8') ?></td>
+                <td><?= $nome->cidade ? 'Importado' : 'Nacional' ?></td>
+                <td><?= htmlspecialchars($nome->data_criacao, ENT_QUOTES, 'UTF-8') ?></td>
+                <td>
+                    <span class="actions">
+                        <a href="/viacoes/<?= (int) $nome->id ?>/edit">Editar</a>
+
+                        <form method="post" action="/viacoes/<?= (int) $nome->id ?>/delete" onsubmit="return confirm('Remover esta marca?');">
+                            <button type="submit">Excluir</button>
+                        </form>
+                    </span>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
 <?php endif; ?>
-
-<form method="post" action="/brands/<?= (int) $marca->id ?>" >
-    <div>
-        <label for="brand">Nome da marca</label><br>
-        <input
-            id="brand"
-            type="text"
-            name="brand"
-            value="<?= htmlspecialchars($old['brand'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-            required
-            maxlength="255"
-        >
-    </div>
-
-    <div>
-        <label for="description">Descrição</label><br>
-        <textarea id="description" name="description" rows="4" cols="60"><?= htmlspecialchars($old['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
-    </div>
-
-    <div>
-        <label>
-            <input type="checkbox" name="is_imported" value="1" <?= !empty($old['is_imported']) ? 'checked' : '' ?>>
-            Importada (marca estrangeira)
-        </label>
-    </div>
-
-    <button type="submit">Salvar alterações</button>
-</form>

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /** @var list<string> $errors */
-/** @var array{nome: string, logo: string, Status: bool} $old */
+/** @var array{viacao: string, cidade: string, Status: bool} $old */
 
 ?>
 
@@ -22,26 +22,26 @@ declare(strict_types=1);
 
 <form method="post" action="/viacoes">
     <div>
-        <label for="nome">Nome da viação</label><br>
+        <label for="viacao">Nome da marca</label><br>
         <input
-            id="nome"
+            id="viacao"
             type="text"
-            name="nome"
-            value="<?= htmlspecialchars($old['nome'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+            name="viacao"
+            value="<?= htmlspecialchars($old['viacao'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
             required
             maxlength="255"
         >
     </div>
 
     <div>
-        <label for="logo">Descrição</label><br>
-        <textarea id="logo" name="logo" rows="4" cols="60"><?= htmlspecialchars($old['logo'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <label for="cidade">Descrição</label><br>
+        <input id="cidade" name="cidade" ><?= htmlspecialchars($old['cidade'] ?? '', ENT_QUOTES, 'UTF-8') ?></input>
     </div>
 
     <div>
         <label>
             <input type="checkbox" name="Status" value="1" <?= !empty($old['Status']) ? 'checked' : '' ?>>
-            Importada (marca estrangeira)
+            Ativo
         </label>
     </div>
 

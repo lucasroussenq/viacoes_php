@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /** @var list<string> $errors */
-/** @var array{title: string, description: string, is_done: bool} $old */
+/** @var array{title: string, cidade: string, is_done: bool} $old */
 
 ?>
 
@@ -34,8 +34,8 @@ declare(strict_types=1);
     </div>
 
     <div>
-        <label for="description">Descrição</label><br>
-        <textarea id="description" name="description" rows="4" cols="60"><?= htmlspecialchars($old['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <label for="cidade">Descrição</label><br>
+        <textarea id="cidade" name="cidade" rows="4" cols="60"><?= htmlspecialchars($old['cidade'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
     </div>
 
     <div>

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Models\CoffeeBrands;
+use App\Models\Viacao;
 
-/** @var CoffeeBrands $marca */
+/** @var Viacao $marca */
 /** @var list<string> $errors */
-/** @var array{brand: string, description: string, is_imported: bool} $old */
+/** @var array{nome: string, cidade: string, Status: bool} $old */
 
 ?>
 
@@ -23,27 +23,27 @@ use App\Models\CoffeeBrands;
     </div>
 <?php endif; ?>
 
-<form method="post" action="/brands/<?= (int) $marca->id ?>" >
+<form method="post" action="/viacoes/<?= (int) $marca->id ?>" >
     <div>
-        <label for="brand">Nome da marca</label><br>
+        <label for="nome">Nome da marca</label><br>
         <input
-            id="brand"
+            id="nome"
             type="text"
-            name="brand"
-            value="<?= htmlspecialchars($old['brand'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+            name="nome"
+            value="<?= htmlspecialchars($old['nome'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
             required
             maxlength="255"
         >
     </div>
 
     <div>
-        <label for="description">Descrição</label><br>
-        <textarea id="description" name="description" rows="4" cols="60"><?= htmlspecialchars($old['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <label for="cidade">Descrição</label><br>
+        <textarea id="cidade" name="cidade" rows="4" cols="60"><?= htmlspecialchars($old['cidade'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
     </div>
 
     <div>
         <label>
-            <input type="checkbox" name="is_imported" value="1" <?= !empty($old['is_imported']) ? 'checked' : '' ?>>
+            <input type="checkbox" name="Status" value="1" <?= !empty($old['Status']) ? 'checked' : '' ?>>
             Importada (marca estrangeira)
         </label>
     </div>

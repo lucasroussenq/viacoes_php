@@ -47,15 +47,15 @@ final class TaskService
     }
 
     /** Cria uma task e retorna o id gerado. */
-    public function create(string $title, ?string $description, bool $isDone): int
+    public function create(string $title, ?string $cidade, bool $isDone): int
     {
         $stmt = $this->pdo->prepare(
-            'INSERT INTO tasks (title, description, is_done) VALUES (:title, :description, :is_done)'
+            'INSERT INTO tasks (title, cidade, is_done) VALUES (:title, :cidade, :is_done)'
         );
 
         $stmt->execute([
             'title' => $title,
-            'description' => $description,
+            'cidade' => $cidade,
             'is_done' => $isDone ? 1 : 0,
         ]);
 
@@ -63,16 +63,16 @@ final class TaskService
     }
 
     /** Atualiza os campos de uma task existente. */
-    public function update(int $id, string $title, ?string $description, bool $isDone): void
+    public function update(int $id, string $title, ?string $cidade, bool $isDone): void
     {
         $stmt = $this->pdo->prepare(
-            'UPDATE tasks SET title = :title, description = :description, is_done = :is_done WHERE id = :id'
+            'UPDATE tasks SET title = :title, cidade = :cidade, is_done = :is_done WHERE id = :id'
         );
 
         $stmt->execute([
             'id' => $id,
             'title' => $title,
-            'description' => $description,
+            'cidade' => $cidade,
             'is_done' => $isDone ? 1 : 0,
         ]);
     }

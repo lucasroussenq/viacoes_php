@@ -38,7 +38,7 @@ final class TaskController
             'errors' => [],
             'old' => [
                 'title' => '',
-                'description' => '',
+                'cidade' => '',
                 'is_done' => false,
             ],
         ]);
@@ -48,7 +48,7 @@ final class TaskController
     public function store(): void
     {
         $title = trim((string) ($_POST['title'] ?? ''));
-        $description = trim((string) ($_POST['description'] ?? ''));
+        $cidade = trim((string) ($_POST['cidade'] ?? ''));
         $isDone = isset($_POST['is_done']) && (string) $_POST['is_done'] === '1';
 
         $errors = $this->validate($title);
@@ -59,7 +59,7 @@ final class TaskController
                 'errors' => $errors,
                 'old' => [
                     'title' => $title,
-                    'description' => $description,
+                    'cidade' => $cidade,
                     'is_done' => $isDone,
                 ],
             ]);
@@ -68,7 +68,7 @@ final class TaskController
 
         $id = $this->tasks->create(
             $title,
-            $description !== '' ? $description : null,
+            $cidade !== '' ? $cidade : null,
             $isDone
         );
 
@@ -93,7 +93,7 @@ final class TaskController
             'errors' => [],
             'old' => [
                 'title' => $task->title,
-                'description' => $task->description ?? '',
+                'cidade' => $task->cidade ?? '',
                 'is_done' => $task->isDone,
             ],
         ]);
@@ -111,7 +111,7 @@ final class TaskController
         }
 
         $title = trim((string) ($_POST['title'] ?? ''));
-        $description = trim((string) ($_POST['description'] ?? ''));
+        $cidade = trim((string) ($_POST['cidade'] ?? ''));
         $isDone = isset($_POST['is_done']) && (string) $_POST['is_done'] === '1';
 
         $errors = $this->validate($title);
@@ -123,7 +123,7 @@ final class TaskController
                 'errors' => $errors,
                 'old' => [
                     'title' => $title,
-                    'description' => $description,
+                    'cidade' => $cidade,
                     'is_done' => $isDone,
                 ],
             ]);
@@ -133,7 +133,7 @@ final class TaskController
         $this->tasks->update(
             $id,
             $title,
-            $description !== '' ? $description : null,
+            $cidade !== '' ? $cidade : null,
             $isDone
         );
 
