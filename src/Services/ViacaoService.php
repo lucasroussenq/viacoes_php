@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\viacao;
+use App\Models\Viacao;
 use PDO;
 
 /** Concentra operacoes de CRUD e mapeamento de viacao. */
@@ -21,12 +21,12 @@ final class ViacaoService
     /** @return list<viacao> Retorna todas as marcas, da mais nova para a mais antiga. */
     public function all(): array
     {
-        $stmt = $this->pdo->query('SELECT * FROM coffee_viacoes ORDER BY id DESC');
+        $stmt = $this->pdo->query('SELECT * FROM viacoes ORDER BY id DESC');
         $rows = $stmt->fetchAll();
 
         $viacoes = [];
         foreach ($rows as $row) {
-            $viacoes[] = viacao::fromRow($row);
+            $viacoes[] = Viacao::fromRow($row);
         }
 
         return $viacoes;
@@ -35,7 +35,7 @@ final class ViacaoService
     /** @return viacao|null Retorna null quando o id nao existe. */
     public function find(int $id): ?viacao
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM coffee_viacoes WHERE id = :id');
+        $stmt = $this->pdo->prepare('SELECT * FROM viacoes WHERE id = :id');
         $stmt->execute(['id' => $id]);
 
         $row = $stmt->fetch();
@@ -43,14 +43,14 @@ final class ViacaoService
             return null;
         }
 
-        return viacao::fromRow($row);
+        return Viacao::fromRow($row);
     }
 
     /** Cria uma marca e retorna o id gerado. */
     public function create(string $nome, ?string $cidade, bool $status): int
     {
         $stmt = $this->pdo->prepare(
-            'INSERT INTO coffee_viacoes (nome, cidade, Status) VALUES (:nome, :cidade, :Status)'
+            'INSERT INTO viacoes (nome, url, cidade, logo, status) VALUES (:nome, :url, :cidade, :logo, :status)'
         );
 
         $stmt->execute([
@@ -66,7 +66,7 @@ final class ViacaoService
     public function update(int $id, string $nome, ?string $cidade, bool $status): void
     {
         $stmt = $this->pdo->prepare(
-            'UPDATE coffee_viacoes SET nome = :nome, cidade = :cidade, Status = :Status WHERE id = :id'
+            'UPDATE viacoes SET nome = :nome, cidade = :cidade, Status = :Status WHERE id = :id'
         );
 
         $stmt->execute([
@@ -80,7 +80,7 @@ final class ViacaoService
     /** Remove uma marca pelo id. */
     public function delete(int $id): void
     {
-        $stmt = $this->pdo->prepare('DELETE FROM coffee_viacoes WHERE id = :id');
+        $stmt = $this->pdo->prepare('DELETE FROM viacoes WHERE id = :id');
         $stmt->execute(['id' => $id]);
     }
 }

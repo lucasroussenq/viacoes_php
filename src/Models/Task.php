@@ -24,7 +24,7 @@ final class Task
         return new self(
             id: (int) $row['id'],
             title: (string) $row['title'],
-            cidade: $row['cidade'] !== null ? (string) $row['cidade'] : null,
+            cidade: isset($row['cidade']) ? (string) $row['cidade'] : null,
             isDone: ((int) $row['is_done']) === 1,
             data_criacao: (string) $row['created_at'],
             data_atualizacao: $row['updated_at'] !== null ? (string) $row['updated_at'] : null,

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Models\viacoes;
+use App\Models\Viacao;
 
-/** @var list<Coffeeviacoes> $viacoes */
+/** @var list<Viacao> $viacoes */
 
 ?>
 

@@ -60,8 +60,8 @@ final class TaskApiController
             'title' => $task->title,
             'cidade' => $task->cidade,
             'is_done' => $task->isDone,
-            'created_at' => $task->data_criacao,
-            'updated_at' => $task->data_atualizacao,
+            'data_criacao' => $task->data_criacao,
+            'data_atualizacao' => $task->data_atualizacao,
         ];
     }
 

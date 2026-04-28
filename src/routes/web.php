@@ -20,8 +20,9 @@ $router->post('/tasks/{id}', [TaskController::class, 'update']);
 $router->post('/tasks/{id}/delete', [TaskController::class, 'destroy']);
 
 $router->get('/viacoes', [ViacaoController::class, 'index']);
-$router->post('/nomes', [ViacaoController::class, 'loja']);
+$router->get('/viacoes/create', [ViacaoController::class, 'create']);
+$router->post('/viacoes', [ViacaoController::class, 'loja']);
 
-$router->get('/nomes/{id}/edit', [ViacaoController::class, 'edit']);
-$router->post('/nomes/{id}', [ViacaoController::class, 'update']);
-$router->post('/nomes/{id}/delete', [ViacaoController::class, 'destroy']);
+$router->get('/viacoes/{id}/edit', [ViacaoController::class, 'edit']);
+$router->post('/viacoes/{id}', [ViacaoController::class, 'update']);
+$router->post('/viacoes/{id}/delete', [ViacaoController::class, 'destroy']);

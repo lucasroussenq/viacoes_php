@@ -11,18 +11,18 @@ use App\Services\ViacaoService;
 final class ViacaoController
 {
     /** Service usado para consultar e alterar marcas. */
-    private ViacaoService $viacao;
+    private ViacaoService $viacaoService;
 
     /** @param ViacaoService|null $viacoes Permite injecao em testes. */
     public function __construct(?ViacaoService $ViacaoService = null)
     {
-        $this->ViacaoService = $ViacaoService ?? new ViacaoService();
+        $this->viacaoService = $ViacaoService ?? new ViacaoService();
     }
 
     /** Lista marcas e renderiza a tela principal. */
     public function index(): void
     {
-        $Viacoes = $this->ViacaoService->all();
+        $Viacoes = $this->viacaoService->all();
 
         View::render('Viacoes/index', [
             'title' => 'Marcas de café',
@@ -70,7 +70,7 @@ final class ViacaoController
             return;
         }
 
-        $id = $this->ViacaoService->create(
+        $id = $this->viacaoService->create(
             $NomeViacao,
             $logo !== '' ? $logo : null,
             $status
@@ -83,7 +83,7 @@ final class ViacaoController
     /** Exibe o formulario de edicao de uma marca. */
     public function edit(int $id): void
     {
-        $nome = $this->ViacaoService->find($id);
+        $nome = $this->viacaoService->find($id);
 
         if ($nome === null) {
             http_response_code(404);
@@ -106,7 +106,7 @@ final class ViacaoController
     /** Processa o POST de atualizacao. */
     public function update(int $id): void
     {
-        $nome = $this->ViacaoService->find($id);
+        $nome = $this->viacaoService->find($id);
 
         if ($nome === null) {
             http_response_code(404);
@@ -134,7 +134,7 @@ final class ViacaoController
             return;
         }
 
-        $this->ViacaoService->update(
+        $this->viacaoService->update(
             $id,
             $NomeViacao,
             $logo !== '' ? $logo : null,
@@ -148,7 +148,7 @@ final class ViacaoController
     /** Remove uma marca via POST para evitar delete por GET. */
     public function destroy(int $id): void
     {
-        $nome = $this->ViacaoService->find($id);
+        $nome = $this->viacaoService->find($id);
 
         if ($nome === null) {
             http_response_code(404);
@@ -156,7 +156,7 @@ final class ViacaoController
             return;
         }
 
-        $this->ViacaoService->delete($id);
+        $this->viacaoService->delete($id);
 
         View::flash('success', 'viacao removida com sucesso.');
         View::redirect('/Viacoes');
