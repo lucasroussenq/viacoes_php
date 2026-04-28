@@ -20,7 +20,7 @@ final class Viacao
     ) {
     }
 
-    /** @param array<string, mixed> $row Mapeia uma linha do PDO para CoffeeBrands. */
+    /** @param array<string, mixed> $row Mapeia uma linha do PDO para Viacao. */
     public static function fromRow(array $row): self
     {
         return new self(

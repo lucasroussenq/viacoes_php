@@ -18,7 +18,7 @@ $router->get('/tasks/{id}/edit', [TaskController::class, 'edit']);
 $router->post('/tasks/{id}', [TaskController::class, 'update']);
 $router->post('/tasks/{id}/delete', [TaskController::class, 'destroy']);
 
-$router->get('/brands', [CoffeeBrandsController::class, 'index']);
+$router->get('/viacoes', [CoffeeBrandsController::class, 'index']);
 
 $router->get('/brands/create', [CoffeeBrandsController::class, 'create']);
 $router->post('/brands', [CoffeeBrandsController::class, 'store']);
