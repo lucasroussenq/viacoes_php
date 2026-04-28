@@ -5,6 +5,7 @@ declare(strict_types=1);
 /** Arquivo de registro de rotas web. */
 use App\Controllers\TaskController;
 use App\Controllers\CoffeeBrandsController;
+use App\Controllers\ViacaoController;
 
 /** @var App\Core\Router $router */
 
@@ -18,7 +19,12 @@ $router->get('/tasks/{id}/edit', [TaskController::class, 'edit']);
 $router->post('/tasks/{id}', [TaskController::class, 'update']);
 $router->post('/tasks/{id}/delete', [TaskController::class, 'destroy']);
 
-$router->get('/viacoes', [CoffeeBrandsController::class, 'index']);
+$router->get('/viacoes', [ViacaoController::class, 'index']);
+$router->post('/nomes', [ViacaoController::class, 'loja']);
+
+$router->get('/nomes/{id}/edit', [ViacaoController::class, 'edit']);
+$router->post('/nomes/{id}', [ViacaoController::class, 'update']);
+$router->post('/nomes/{id}/delete', [ViacaoController::class, 'destroy']);
 
 $router->get('/brands/create', [CoffeeBrandsController::class, 'create']);
 $router->post('/brands', [CoffeeBrandsController::class, 'store']);

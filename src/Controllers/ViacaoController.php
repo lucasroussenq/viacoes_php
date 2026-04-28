@@ -11,9 +11,9 @@ use App\Services\ViacaoService;
 final class ViacaoController
 {
     /** Service usado para consultar e alterar marcas. */
-    private ViacaoService $ViacaoService;
+    private ViacaoService $viacao;
 
-    /** @param ViacaoService|null $ViacaoService Permite injecao em testes. */
+    /** @param ViacaoService|null $viacoes Permite injecao em testes. */
     public function __construct(?ViacaoService $ViacaoService = null)
     {
         $this->ViacaoService = $ViacaoService ?? new ViacaoService();
@@ -22,58 +22,62 @@ final class ViacaoController
     /** Lista marcas e renderiza a tela principal. */
     public function index(): void
     {
-        $nomes = $this->ViacaoService->all();
+        $Viacoes = $this->ViacaoService->all();
 
-        View::render('nomes/index', [
+        View::render('Viacoes/index', [
             'title' => 'Marcas de café',
-            'nomes' => $nomes,
+            'Viacoes' => $Viacoes,
         ]);
     }
 
     /** Exibe o formulario de criacao. */
     public function create(): void
     {
-        View::render('nomes/create', [
+        View::render('Viacoes/create', [
             'title' => 'Criar marca',
             'errors' => [],
             'old' => [
                 'nome' => '',
-                'description' => '',
-                'is_imported' => false,
+                'logo' => '',
+                'Status' => false,
             ],
         ]);
     }
 
     /** Processa o POST de criacao com PRG (Post Redirect Get). */
-    public function store(): void
+    public function loja(): void
     {
-        $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
-        $description = trim((string) ($_POST['description'] ?? ''));
-        $isImported = isset($_POST['is_imported']) && (string) $_POST['is_imported'] === '1';
+        $NomeViacao = trim((string) ($_POST['nome'] ?? ''));
+        $url = trim((string) ($_POST['url'] ?? ''));
+        $cidade = trim((string) ($_POST['cidade'] ?? ''));
+        $logo = trim((string) ($_POST['logo'] ?? ''));
+        $status = isset($_POST['Status']) && (string) $_POST['Status'] === '1';
 
-        $errors = $this->validate($nomeViacao);
+        $errors = $this->validate($NomeViacao);
 
         if ($errors !== []) {
-            View::render('nomes/create', [
-                'title' => 'Criar marca',
+            View::render('Viacoes/create', [
+                'title' => 'Criar viacao',
                 'errors' => $errors,
                 'old' => [
-                    'nome' => $nomeViacao,
-                    'description' => $description,
-                    'is_imported' => $isImported,
+                    'nome' => $NomeViacao,
+                    'url' => $url,
+                    'cidade' => $cidade,
+                    'logo' => $logo,
+                    'status' => $status,
                 ],
             ]);
             return;
         }
 
         $id = $this->ViacaoService->create(
-            $nomeViacao,
-            $description !== '' ? $description : null,
-            $isImported
+            $NomeViacao,
+            $logo !== '' ? $logo : null,
+            $status
         );
 
-        View::flash('success', 'Marca criada com sucesso (#' . $id . ').');
-        View::redirect('/nomes');
+        View::flash('success', 'viação criada com sucesso (#' . $id . ').');
+        View::redirect('/Viacoes');
     }
 
     /** Exibe o formulario de edicao de uma marca. */
@@ -87,14 +91,14 @@ final class ViacaoController
             return;
         }
 
-        View::render('nomes/edit', [
-            'title' => 'Editar marca',
-            'marca' => $nome,
+        View::render('Viacoes/edit', [
+            'title' => 'Editar viacao',
+            'viacao' => $nome,
             'errors' => [],
             'old' => [
                 'nome' => $nome->nome,
-                'description' => $nome->description ?? '',
-                'is_imported' => $nome->isImported,
+                'logo' => $nome->logo ?? '',
+                'Status' => $nome->status,
             ],
         ]);
     }
@@ -106,25 +110,25 @@ final class ViacaoController
 
         if ($nome === null) {
             http_response_code(404);
-            echo 'Marca não encontrada.';
+            echo 'viação não encontrada.';
             return;
         }
 
-        $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
-        $description = trim((string) ($_POST['description'] ?? ''));
-        $isImported = isset($_POST['is_imported']) && (string) $_POST['is_imported'] === '1';
+        $NomeViacao = trim((string) ($_POST['nome'] ?? ''));
+        $logo = trim((string) ($_POST['logo'] ?? ''));
+        $status = isset($_POST['Status']) && (string) $_POST['Status'] === '1';
 
-        $errors = $this->validate($nomeViacao);
+        $errors = $this->validate($NomeViacao);
 
         if ($errors !== []) {
-            View::render('nomes/edit', [
+            View::render('Viacoes/edit', [
                 'title' => 'Editar marca',
                 'marca' => $nome,
                 'errors' => $errors,
                 'old' => [
-                    'nome' => $nomeViacao,
-                    'description' => $description,
-                    'is_imported' => $isImported,
+                    'nome' => $NomeViacao,
+                    'logo' => $logo,
+                    'Status' => $status,
                 ],
             ]);
             return;
@@ -132,13 +136,13 @@ final class ViacaoController
 
         $this->ViacaoService->update(
             $id,
-            $nomeViacao,
-            $description !== '' ? $description : null,
-            $isImported
+            $NomeViacao,
+            $logo !== '' ? $logo : null,
+            $status
         );
 
-        View::flash('success', 'Marca atualizada com sucesso.');
-        View::redirect('/nomes');
+        View::flash('success', 'viacao atualizada com sucesso.');
+        View::redirect('/Viacoes');
     }
 
     /** Remove uma marca via POST para evitar delete por GET. */
@@ -154,21 +158,21 @@ final class ViacaoController
 
         $this->ViacaoService->delete($id);
 
-        View::flash('success', 'Marca removida com sucesso.');
-        View::redirect('/nomes');
+        View::flash('success', 'viacao removida com sucesso.');
+        View::redirect('/Viacoes');
     }
 
     /** @return list<string> Retorna erros de validacao do nome da marca. */
-    private function validate(string $nomeViacao): array
+    private function validate(string $NomeViacao): array
     {
         $errors = [];
 
-        if ($nomeViacao === '') {
-            $errors[] = 'O nome da marca é obrigatório.';
+        if ($NomeViacao === '') {
+            $errors[] = 'O nome da viação é obrigatório.';
         }
 
-        if (strlen($nomeViacao) > 255) {
-            $errors[] = 'O nome da marca deve ter no máximo 255 caracteres.';
+        if (strlen($NomeViacao) > 255) {
+            $errors[] = 'O nome da viação deve ter no máximo 255 caracteres.';
         }
 
         return $errors;
