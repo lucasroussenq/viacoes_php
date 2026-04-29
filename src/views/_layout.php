@@ -22,8 +22,8 @@ $flash = View::pullFlash();
     <nav>
         <a href="/tasks">Tasks</a>
         | <a href="/tasks/create">Nova task</a>
-        | <a href="/viacoes">Marcas de café</a>
-        | <a href="/viacoes/create">Nova marca</a>
+        | <a href="/viacoes">Viacoes</a>
+        | <a href="/viacoes/create">Nova viacao</a>
 
     </nav>
 </header>

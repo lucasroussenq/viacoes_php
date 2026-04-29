@@ -22,18 +22,18 @@ final class ViacaoController
     /** Lista marcas e renderiza a tela principal. */
     public function index(): void
     {
-        $Viacoes = $this->viacaoService->all();
+        $viacoes = $this->viacaoService->all();
 
-        View::render('Viacoes/index', [
-            'title' => 'Marcas de café',
-            'Viacoes' => $Viacoes,
+        View::render('viacoes/index', [
+            'title' => 'Viações',
+            'viacoes' => $viacoes,
         ]);
     }
 
     /** Exibe o formulario de criacao. */
     public function create(): void
     {
-        View::render('Viacoes/create', [
+        View::render('viacoes/create', [
             'title' => 'Criar marca',
             'errors' => [],
             'old' => [
@@ -56,7 +56,7 @@ final class ViacaoController
         $errors = $this->validate($NomeViacao);
 
         if ($errors !== []) {
-            View::render('Viacoes/create', [
+            View::render('viacoes/create', [
                 'title' => 'Criar viacao',
                 'errors' => $errors,
                 'old' => [
@@ -77,7 +77,7 @@ final class ViacaoController
         );
 
         View::flash('success', 'viação criada com sucesso (#' . $id . ').');
-        View::redirect('/Viacoes');
+        View::redirect('/viacoes');
     }
 
     /** Exibe o formulario de edicao de uma marca. */
@@ -91,7 +91,7 @@ final class ViacaoController
             return;
         }
 
-        View::render('Viacoes/edit', [
+        View::render('viacoes/edit', [
             'title' => 'Editar viacao',
             'viacao' => $nome,
             'errors' => [],
@@ -121,7 +121,7 @@ final class ViacaoController
         $errors = $this->validate($NomeViacao);
 
         if ($errors !== []) {
-            View::render('Viacoes/edit', [
+            View::render('viacoes/edit', [
                 'title' => 'Editar marca',
                 'marca' => $nome,
                 'errors' => $errors,
@@ -142,7 +142,7 @@ final class ViacaoController
         );
 
         View::flash('success', 'viacao atualizada com sucesso.');
-        View::redirect('/Viacoes');
+        View::redirect('/viacoes');
     }
 
     /** Remove uma marca via POST para evitar delete por GET. */
@@ -159,7 +159,7 @@ final class ViacaoController
         $this->viacaoService->delete($id);
 
         View::flash('success', 'viacao removida com sucesso.');
-        View::redirect('/Viacoes');
+        View::redirect('/viacoes');
     }
 
     /** @return list<string> Retorna erros de validacao do nome da marca. */
