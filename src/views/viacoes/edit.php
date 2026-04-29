@@ -6,7 +6,7 @@ use App\Models\Viacao;
 
 /** @var Viacao $viacao */
 /** @var list<string> $errors */
-/** @var array{nome: string, cidade: string, Status: bool} $old */
+/** @var array{nome: string, cidade: string, status: bool} $old */
 
 ?>
 
@@ -23,7 +23,7 @@ use App\Models\Viacao;
     </div>
 <?php endif; ?>
 
-<form method="post" action="/viacoes">
+<form method="post" action="/viacoes/<?= (int) $viacao->id ?>">
     <div>
         <label for="nome">Nome da marca</label><br>
         <input
@@ -81,14 +81,12 @@ use App\Models\Viacao;
         <label>Status</label><br>
 
         <!-- Campo oculto garante que "inativo" seja enviado se nenhum botão for clicado -->
-        <input type="hidden" name="Status" value="0">
-
         <label>
             <input
                     type="radio"
-                    name="Status"
+                    name="status"
                     value="1"
-                    <?= !empty($old['Status']) ? 'checked' : '' ?>
+                    <?= !empty($old['status']) ? 'checked' : '' ?>
             >
             Ativo
         </label>
@@ -96,9 +94,9 @@ use App\Models\Viacao;
         <label>
             <input
                     type="radio"
-                    name="Status"
+                    name="status"
                     value="0"
-                    <?= empty($old['Status']) ? 'checked' : '' ?>
+                    <?= empty($old['status']) ? 'checked' : '' ?>
             >
             Inativo
         </label>

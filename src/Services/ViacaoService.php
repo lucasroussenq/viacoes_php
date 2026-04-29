@@ -47,7 +47,7 @@ final class ViacaoService
     }
 
     /** Cria uma marca e retorna o id gerado. */
-    public function create(string $nome, ?string $cidade, bool $status): int
+    public function create(string $nome, ?string $url , ?string $cidade, ?string $logo, bool $status): int
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO viacoes (nome, url, cidade, logo, status) VALUES (:nome, :url, :cidade, :logo, :status)'
@@ -58,24 +58,29 @@ final class ViacaoService
             'url'=> $url,
             'cidade' => $cidade,
             'logo' => $logo,
-            'Status' => $status ? 1 : 0,
+            'status' => $status ? 1 : 0,
         ]);
 
         return (int) $this->pdo->lastInsertId();
     }
 
-    /** Atualiza os campos de uma marca existente. */
-    public function update(int $id, string $nome, ?string $cidade, bool $status): void
+    /** Atualiza os campos de uma marca existente.
+     * @param string|null $logo
+     * @param string|null $url
+     */
+    public function update(int $id, string $nome, ?string $cidade, bool $status, ?string $url, ?string $logo): void
     {
         $stmt = $this->pdo->prepare(
-            'UPDATE viacoes SET nome = :nome, cidade = :cidade, Status = :Status WHERE id = :id'
+            'UPDATE viacoes SET nome = :nome, url = :url, cidade = :cidade, logo = :logo, status = :status WHERE id = :id'
         );
 
         $stmt->execute([
             'id' => $id,
             'nome' => $nome,
+            'url'=> $url,
             'cidade' => $cidade,
-            'Status' => $status ? 1 : 0,
+            'logo' => $logo,
+            'status' => $status ? 1 : 0,
         ]);
     }
 

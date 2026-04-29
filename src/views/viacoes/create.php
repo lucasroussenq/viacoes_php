@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /** @var list<string> $errors */
-/** @var array{viacao: string, cidade: string, Status: bool} $old */
+/** @var array{nome: string, cidade: string, status: bool, url: string, logo: string} $old */
 
 ?>
 
@@ -26,8 +26,8 @@ declare(strict_types=1);
         <input
             id="viacao"
             type="text"
-            name="viacao"
-            value="<?= htmlspecialchars($old['viacao'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+            name="nome"
+            value="<?= htmlspecialchars($old['nome'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
             required
             maxlength="255"
         >
@@ -46,17 +46,17 @@ declare(strict_types=1);
     </div>
 
     <div>
-        <label for="cidade">Descrição</label><br>
+        <label for="cidade">cidade</label><br>
         <input id="cidade" name="cidade" ><?= htmlspecialchars($old['cidade'] ?? '', ENT_QUOTES, 'UTF-8') ?></input>
     </div>
 
     <div>
         <label for="logo_file">Logo</label><br>
 
-        <?php if (!empty($old['logo_path'])): ?>
+        <?php if (!empty($old['logo'])): ?>
             <div style="margin-bottom: 8px;">
                 <img
-                        src="<?= htmlspecialchars($old['logo_path'], ENT_QUOTES, 'UTF-8') ?>"
+                        src="<?= htmlspecialchars($old['logo'], ENT_QUOTES, 'UTF-8') ?>"
                         alt="Logo atual"
                         style="width: 160px; height: 60px; object-fit: contain; border: 1px solid #ddd;"
                 >
@@ -66,7 +66,7 @@ declare(strict_types=1);
         <input
                 id="logo_file"
                 type="file"
-                name="logo_file"
+                name="logo"
                 accept="image/png, image/jpeg, image/svg+xml"
         >
         <p style="font-size: 12px; color: #666;">
@@ -78,14 +78,13 @@ declare(strict_types=1);
         <label>Status</label><br>
 
         <!-- Campo oculto garante que "inativo" seja enviado se nenhum botão for clicado -->
-        <input type="hidden" name="Status" value="0">
 
         <label>
             <input
                     type="radio"
-                    name="Status"
+                    name="status"
                     value="1"
-                    <?= !empty($old['Status']) ? 'checked' : '' ?>
+                    <?= !empty($old['status']) ? 'checked' : '' ?>
             >
             Ativo
         </label>
@@ -93,9 +92,9 @@ declare(strict_types=1);
         <label>
             <input
                     type="radio"
-                    name="Status"
+                    name="status"
                     value="0"
-                    <?= empty($old['Status']) ? 'checked' : '' ?>
+                    <?= empty($old['status']) ? 'checked' : '' ?>
             >
             Inativo
         </label>

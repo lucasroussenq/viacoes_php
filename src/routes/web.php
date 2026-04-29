@@ -21,7 +21,7 @@ $router->post('/tasks/{id}/delete', [TaskController::class, 'destroy']);
 
 $router->get('/viacoes', [ViacaoController::class, 'index']);
 $router->get('/viacoes/create', [ViacaoController::class, 'create']);
-$router->post('/viacoes', [ViacaoController::class, 'loja']);
+$router->post('/viacoes', [ViacaoController::class, 'store']);
 
 $router->get('/viacoes/{id}/edit', [ViacaoController::class, 'edit']);
 $router->post('/viacoes/{id}', [ViacaoController::class, 'update']);

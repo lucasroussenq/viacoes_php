@@ -30,6 +30,8 @@ final class ViacaoController
         ]);
     }
 
+
+
     /** Exibe o formulario de criacao. */
     public function create(): void
     {
@@ -39,28 +41,28 @@ final class ViacaoController
             'old' => [
                 'nome' => '',
                 'logo' => '',
-                'Status' => false,
+                'status' => false,
             ],
         ]);
     }
 
     /** Processa o POST de criacao com PRG (Post Redirect Get). */
-    public function loja(): void
+    public function store(): void
     {
-        $NomeViacao = trim((string) ($_POST['nome'] ?? ''));
+        $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
         $url = trim((string) ($_POST['url'] ?? ''));
         $cidade = trim((string) ($_POST['cidade'] ?? ''));
         $logo = trim((string) ($_POST['logo'] ?? ''));
-        $status = isset($_POST['Status']) && (string) $_POST['Status'] === '1';
+        $status = isset($_POST['status']) && (string) $_POST['status'] === '1';
 
-        $errors = $this->validate($NomeViacao);
+        $errors = $this->validate($nomeViacao);
 
         if ($errors !== []) {
             View::render('viacoes/create', [
                 'title' => 'Criar viacao',
                 'errors' => $errors,
                 'old' => [
-                    'nome' => $NomeViacao,
+                    'nome' => $nomeViacao,
                     'url' => $url,
                     'cidade' => $cidade,
                     'logo' => $logo,
@@ -71,9 +73,12 @@ final class ViacaoController
         }
 
         $id = $this->viacaoService->create(
-            $NomeViacao,
-            $logo !== '' ? $logo : null,
+            $nomeViacao,
+            $logo,
+            $cidade,
+            $url,
             $status
+
         );
 
         View::flash('success', 'viação criada com sucesso (#' . $id . ').');
@@ -83,9 +88,9 @@ final class ViacaoController
     /** Exibe o formulario de edicao de uma marca. */
     public function edit(int $id): void
     {
-        $nome = $this->viacaoService->find($id);
+        $viacao = $this->viacaoService->find($id);
 
-        if ($nome === null) {
+        if ($viacao === null) {
             http_response_code(404);
             echo 'Marca não encontrada.';
             return;
@@ -93,12 +98,12 @@ final class ViacaoController
 
         View::render('viacoes/edit', [
             'title' => 'Editar viacao',
-            'viacao' => $nome,
+            'viacao' => $viacao,
             'errors' => [],
             'old' => [
-                'nome' => $nome->nome,
-                'logo' => $nome->logo ?? '',
-                'Status' => $nome->status,
+                'nome' => $viacao->nome,
+                'logo' => $viacao->logo ?? '',
+                'status' => $viacao->status,
             ],
         ]);
     }
@@ -114,21 +119,23 @@ final class ViacaoController
             return;
         }
 
-        $NomeViacao = trim((string) ($_POST['nome'] ?? ''));
+        $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
         $logo = trim((string) ($_POST['logo'] ?? ''));
-        $status = isset($_POST['Status']) && (string) $_POST['Status'] === '1';
+        $cidade = trim((string) ($_POST['cidade'] ?? ''));
+        $url = trim((string) ($_POST['url'] ?? ''));
+        $status = isset($_POST['status']) && (string) $_POST['status'] === '1';
 
-        $errors = $this->validate($NomeViacao);
+        $errors = $this->validate($nomeViacao);
 
         if ($errors !== []) {
             View::render('viacoes/edit', [
-                'title' => 'Editar marca',
-                'marca' => $nome,
+                'title' => 'Editar viacao',
+                'viacao' => $nome,
                 'errors' => $errors,
                 'old' => [
-                    'nome' => $NomeViacao,
+                    'nome' => $nomeViacao,
                     'logo' => $logo,
-                    'Status' => $status,
+                    'status' => $status,
                 ],
             ]);
             return;
@@ -136,9 +143,11 @@ final class ViacaoController
 
         $this->viacaoService->update(
             $id,
-            $NomeViacao,
-            $logo !== '' ? $logo : null,
-            $status
+            $nomeViacao,
+            $cidade,
+            $status,
+            $url,
+           $logo
         );
 
         View::flash('success', 'viacao atualizada com sucesso.');

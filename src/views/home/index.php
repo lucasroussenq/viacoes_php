@@ -22,7 +22,6 @@ use App\Models\Viacao;
             <th>Nome</th>
             <th>Cidade</th>
             <th>logo</th>
-            <th>link</th>
             <th>Status</th>
             <th>Criada em</th>
             <th>Ações</th>
@@ -35,7 +34,6 @@ use App\Models\Viacao;
                 <td><?= htmlspecialchars($viacao->nome, ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= $viacao->cidade ?></td>
                 <td><?= $viacao->logo ?></td>
-                <td><?= $viacao->url ?></td>
                 <td><?= $viacao->status ? 'ativo' : 'inativo' ?></td>
                 <td><?= htmlspecialchars($viacao->data_criacao, ENT_QUOTES, 'UTF-8') ?></td>
                 <td>
