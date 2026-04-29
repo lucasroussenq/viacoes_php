@@ -55,7 +55,9 @@ final class ViacaoService
 
         $stmt->execute([
             'nome' => $nome,
+            'url'=> $url,
             'cidade' => $cidade,
+            'logo' => $logo,
             'Status' => $status ? 1 : 0,
         ]);
 

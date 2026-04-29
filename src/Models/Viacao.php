@@ -27,7 +27,7 @@ final class Viacao
             id: (int) $row['id'],
             nome: (string) $row['nome'],
             url: (string) $row['url'],
-            cidade: (string) $row['cidade'],
+            cidade: (string) ($row['cidade'] ?? ''),
             logo: $row['logo'] !== null ? (string) $row['logo'] : null,
             status: ((int) $row['status']) === 1,
             data_criacao: (string) $row['data_criacao'],
