@@ -74,9 +74,9 @@ final class ViacaoController
 
         $id = $this->viacaoService->create(
             $nomeViacao,
-            $logo,
-            $cidade,
             $url,
+            $cidade,
+            $logo,
             $status
 
         );
