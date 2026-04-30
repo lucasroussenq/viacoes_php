@@ -8,9 +8,9 @@ use App\Models\Viacao;
 /** @var list<string> $errors */
 /** @var array{nome: string, cidade: string, status: bool} $old */
 
-$action = "/viacoes/store";
-$method = null;
-$viacao = null;
+$action = "/viacoes/{id}";
+$method = "PUT";
+$old = $old ?? [];
 ?>
 
 <h1>Editar viacao #<?= (int) $viacao->id ?></h1>

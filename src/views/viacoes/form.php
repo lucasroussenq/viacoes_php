@@ -1,10 +1,5 @@
-<?php
-
-
- ?>
 
 <form method="post" action="/viacoes">
-    <?php echo "FORM CARREGADO"; ?>
     <div>
         <label for="viacao">Nome da marca</label><br>
         <input
