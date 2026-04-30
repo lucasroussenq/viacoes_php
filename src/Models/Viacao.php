@@ -11,9 +11,9 @@ final class Viacao
     public function __construct(
         public int $id,
         public string $nome,
-        public string $url,
         public string $cidade,
         public ?string $logo,
+        public string $url,
         public bool $status,
         public string $data_criacao,
         public ?string $data_atualizacao,
@@ -26,9 +26,9 @@ final class Viacao
         return new self(
             id: (int) $row['id'],
             nome: (string) $row['nome'],
-            url: (string) $row['url'],
             cidade: (string) ($row['cidade'] ?? ''),
             logo: $row['logo'] !== null ? (string) $row['logo'] : null,
+            url: (string) $row['url'],
             status: ((int) $row['status']) === 1,
             data_criacao: (string) $row['data_criacao'],
             data_atualizacao: $row['data_atualizacao'] !== null ? (string) $row['data_atualizacao'] : null,
