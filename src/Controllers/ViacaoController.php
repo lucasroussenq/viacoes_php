@@ -40,6 +40,8 @@ final class ViacaoController
             'errors' => [],
             'old' => [
                 'nome' => '',
+                'url' => '',
+                'cidade' => '',
                 'logo' => '',
                 'status' => false,
             ],
@@ -102,6 +104,8 @@ final class ViacaoController
             'errors' => [],
             'old' => [
                 'nome' => $viacao->nome,
+                'url' => $viacao->url,
+                'cidade' => $viacao->cidade,
                 'logo' => $viacao->logo ?? '',
                 'status' => $viacao->status,
             ],
@@ -120,9 +124,9 @@ final class ViacaoController
         }
 
         $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
-        $logo = trim((string) ($_POST['logo'] ?? ''));
-        $cidade = trim((string) ($_POST['cidade'] ?? ''));
         $url = trim((string) ($_POST['url'] ?? ''));
+        $cidade = trim((string) ($_POST['cidade'] ?? ''));
+        $logo = trim((string) ($_POST['logo'] ?? ''));
         $status = isset($_POST['status']) && (string) $_POST['status'] === '1';
 
         $errors = $this->validate($nomeViacao);
@@ -136,6 +140,8 @@ final class ViacaoController
                     'nome' => $nomeViacao,
                     'logo' => $logo,
                     'status' => $status,
+                    'url' => $url,
+                    'cidade' => $cidade,
                 ],
             ]);
             return;

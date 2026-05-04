@@ -32,6 +32,19 @@ final class ViacaoService
         return $viacoes;
     }
 
+    public function ativas(): array
+    {
+        $stmt = $this->pdo->query('SELECT * FROM viacoes WHERE status = 1 ORDER BY id DESC ');
+        $rows = $stmt->fetchAll();
+
+        $viacoes = [];
+        foreach ($rows as $row) {
+            $viacoes[] = Viacao::fromRow($row);
+        }
+
+        return $viacoes;
+    }
+
     /** @return viacao|null Retorna null quando o id nao existe. */
     public function find(int $id): ?viacao
     {

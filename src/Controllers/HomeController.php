@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Models\Home;
 use Exception;
 use App\Core\View;
 use App\Services\ViacaoService;
@@ -22,7 +23,7 @@ final class HomeController
     public function index(): void
     {
         try {
-            $viacoesAtivas = $this->viacoes->all('', 'ativo', 'nome', 'ASC');
+            $viacoesAtivas = $this->viacoes->ativas();
 
             View::render('home', [
                 'viacoesAtivas' => $viacoesAtivas,

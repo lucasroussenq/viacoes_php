@@ -5,6 +5,7 @@ declare(strict_types=1);
 /** Arquivo de registro de rotas web. */
 use App\Controllers\TaskController;
 use App\Controllers\ViacaoController;
+use App\Controllers\HomeController;
 
 
 /** @var App\Core\Router $router */
@@ -26,3 +27,6 @@ $router->post('/viacoes', [ViacaoController::class, 'store']);
 $router->get('/viacoes/{id}/edit', [ViacaoController::class, 'edit']);
 $router->post('/viacoes/{id}', [ViacaoController::class, 'update']);
 $router->post('/viacoes/{id}/delete', [ViacaoController::class, 'destroy']);
+
+$router->get('/home', [HomeController::class, 'index']);
+
