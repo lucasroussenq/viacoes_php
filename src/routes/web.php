@@ -30,3 +30,4 @@ $router->post('/viacoes/{id}/delete', [ViacaoController::class, 'destroy']);
 
 $router->get('/home', [HomeController::class, 'index']);
 
+$router->get('/viacoes/historico', [ViacaoController::class, 'index']);

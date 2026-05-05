@@ -9,9 +9,12 @@ use App\Models\Viacao;
 ?>
 
 <h1>Marcas</h1>
+
 <p><a href="/home">home</a></p>
 
 <p><a href="/viacoes/create">Criar viação</a></p>
+
+<p><a href="/viacoes/historico">Historico viação</a></p>
 
 <?php if (count($viacoes) === 0): ?>
     <p>Nenhuma viação cadastrada.</p>

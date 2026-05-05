@@ -18,6 +18,13 @@ final class ViacaoService
         $this->pdo = $pdo ?? \getPdo();
     }
 
+    public function historico(): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM viacao_historico ");
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     /** @return list<viacao> Retorna todas as marcas, da mais nova para a mais antiga. */
     public function all(): array
     {
