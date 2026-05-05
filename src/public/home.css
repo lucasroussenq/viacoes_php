@@ -1,0 +1,309 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300..800&display=swap');
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+    /* Marca */
+    --color-primary:       #0d2240;
+    --color-secondary:     #4a5970;
+    --color-accent:        #00a8e1;
+    --color-highlight:     #f7a800;
+
+    /* Texto */
+    --color-text-main:     #000000;
+    --color-text-light:    #ffffff;
+    --color-text-muted:    #6b7280;
+
+    /* Semânticos (estados) */
+    --color-success:       #166534;
+    --color-success-bg:    #ecfdf5;
+    --color-success-soft:  #e6f4ea;
+    --color-danger:        #b91c1c;
+    --color-danger-bg:     #fef2f2;
+    --color-danger-soft:   #fde8e8;
+    --color-warning:       #92400e;
+    --color-warning-bg:    #fffbeb;
+
+    /* Fundos */
+    --color-bg-page:       #0d2240;
+    --color-bg-surface:    #ffffff;
+    --color-bg-alt:        #f9fafb;
+
+    /* UI */
+    --border-color:        rgba(0, 0, 0, 0.15);
+    --border-focus:        var(--color-highlight);
+    --focus-ring:          rgba(0, 168, 225, 0.2);
+
+    /* Forma */
+    --radius-sm:           8px;
+    --radius-md:           10px;
+    --radius-pill:         999px;
+
+    /* Elevação */
+    --shadow-sm:           0 2px 6px rgba(0, 0, 0, 0.1);
+
+    /* Tipografia */
+    --font-base:           'Open Sans', sans-serif;
+    --font-size-xs:        11px;
+    --font-size-sm:        12px;
+    --font-size-base:      14px;
+    --font-size-link:      13px;
+
+    /* Espaçamento */
+    --spacing-xs:          0.5rem;
+    --spacing-sm:          0.75rem;
+    --spacing-md:          1rem;
+    --spacing-lg:          1.5rem;
+    --spacing-xl:          2rem;
+    --spacing-2xl:         3rem;
+
+    /* Transição */
+    --transition:          0.2s ease;
+}
+
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* ============================================================
+   BASE
+   ============================================================ */
+body {
+    font-family: var(--font-base);
+    background: var(--color-bg-page);
+    color: var(--color-text-main);
+    padding: var(--spacing-xl) var(--spacing-md);
+}
+
+h1 {
+    margin-bottom: var(--spacing-md);
+}
+
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container {
+    max-width: 960px;
+    margin: auto;
+    padding: 20px;
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card,
+.table-card,
+.form-card {
+    background: var(--color-bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.form-card {
+    padding: var(--spacing-lg);
+    max-width: 520px;
+}
+
+
+/* ============================================================
+   ALERTAS
+   ============================================================ */
+.alert {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-md);
+    border: 1px solid;
+}
+
+.alert-success {
+    color: var(--color-success);
+    background: var(--color-success-bg);
+}
+
+.alert-danger {
+    color: var(--color-danger);
+    background: var(--color-danger-bg);
+}
+
+.alert-warning {
+    color: var(--color-warning);
+    background: var(--color-warning-bg);
+}
+
+
+/* ============================================================
+   TABELA
+   ============================================================ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-base);
+}
+
+th,
+td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+tbody tr:hover {
+    background: var(--color-bg-alt);
+}
+
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-sm);
+}
+
+.badge-active {
+    color: var(--color-success);
+    background: var(--color-success-soft);
+}
+
+.badge-inactive {
+    color: var(--color-danger);
+    background: var(--color-danger-soft);
+}
+
+
+/* ============================================================
+   LINKS
+   ============================================================ */
+.url-link {
+    color: var(--color-highlight);
+    font-size: var(--font-size-link);
+    text-decoration: none;
+}
+
+.url-link:hover {
+    text-decoration: underline;
+}
+
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background: var(--color-highlight);
+    color: var(--color-text-light);
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-ghost {
+    border-color: var(--border-color);
+    color: var(--color-text-main);
+}
+
+.btn-danger {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+
+/* ============================================================
+   FORMULÁRIOS
+   ============================================================ */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--border-focus);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+.form-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+.actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.actions form {
+    display: inline;
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl) var(--spacing-md);
+    color: var(--color-text-muted);
+}
+
+.date-text {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}

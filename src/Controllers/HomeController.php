@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Models\Home;
-use Exception;
 use App\Core\View;
 use App\Services\ViacaoService;
 
@@ -25,7 +23,7 @@ final class HomeController
         try {
             $viacoesAtivas = $this->viacoes->ativas();
 
-            View::render('home', [
+            View::render('home/index', [
                 'viacoesAtivas' => $viacoesAtivas,
                 'erroConexao'   => false,
 
@@ -35,7 +33,7 @@ final class HomeController
         } catch (PDOException $e) {
             // Se o banco falhar, renderiza a home sem viações
             // (graceful degradation — a página não quebra)
-            View::render('home', [
+            View::render('home/index', [
                 'viacoesAtivas' => [],
                 'erroConexao'   => true,
             ]);

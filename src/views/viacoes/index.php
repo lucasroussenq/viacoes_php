@@ -9,7 +9,7 @@ use App\Models\Viacao;
 ?>
 
 <h1>Marcas</h1>
-<p><a href="/views/Home/index">home</a></p>
+<p><a href="/home">home</a></p>
 
 <p><a href="/viacoes/create">Criar viação</a></p>
 

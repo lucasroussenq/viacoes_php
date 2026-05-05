@@ -1,44 +1,12 @@
 <?php
-session_start();
-if (isset($_GET['limpar_cache'])) {
-    unset($_SESSION['viacoes_cache'], $_SESSION['viacoes_cache_ts']);
-    header('Location: home.php');
-    exit;
-}
-require_once "../database/db.php"; // sobe uma pasta: home/ → src/
 
-$cache_ttl = 300; // segundos
-$agora     = time();
+declare(strict_types=1);
 
-$usar_cache = isset($_SESSION['viacoes_cache'])
-        && isset($_SESSION['viacoes_cache_ts'])
-        && ($agora - $_SESSION['viacoes_cache_ts']) < $cache_ttl;
+use App\Models\Viacao;
 
-if ($usar_cache) {
-    $viacoes      = $_SESSION['viacoes_cache'];
-    $cache_origem = 'cache (sessão)';
-} else {
-    try {
-        $stmt    = $pd2o->query("SELECT * FROM viacoes WHERE status = 1 ORDER BY nome ASC");
-        $viacoes = $stmt->fetchAll();
+/** @var list<Viacao> $viacoesAtivas */
 
-        // salva no cache da sessão
-        $_SESSION['viacoes_cache']    = $viacoes;
-        $_SESSION['viacoes_cache_ts'] = $agora;
-        $cache_origem = 'banco de dados';
-    } catch (Exception $e) {
-        $viacoes      = $_SESSION['viacoes_cache'] ?? []; // usa cache antigo se houver
-        $cache_origem = 'fallback (cache antigo)';
-    }
-}
 
-// Busca todas as viações ativas do banco
-try {
-    $stmt   = $pdo->query("SELECT * FROM viacoes WHERE status = 1 ORDER BY nome ASC");
-    $viacoes = $stmt->fetchAll();
-} catch (Exception $e) {
-    $viacoes = []; // fallback silencioso: página não quebra se o banco cair
-}
 ?>
 
 <!DOCTYPE html>
@@ -48,7 +16,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="icon.png">
     <title>Quero Passagem</title>
-    <link rel="stylesheet" href="style2.css?v=<?= filemtime('style2.css') ?>">  <!--filetime faz com que as mudanças do css apareçam no home-->
+    <link rel="stylesheet" href="home.css">  <!--filetime faz com que as mudanças do css apareçam no home-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--para celulares-->
 
 
@@ -67,7 +35,7 @@ try {
 </header>
 
 <div class="cache">
-     Viações carregadas do: <strong><?= $cache_origem ?></strong>
+
      <a href="?limpar_cache=1" >Limpar cache</a>
      <a href="../index.php" >Painel admin</a> <!--link para voltar para o index.php-->
 </div>
