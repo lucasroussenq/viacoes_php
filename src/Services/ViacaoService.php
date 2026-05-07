@@ -20,7 +20,7 @@ final class ViacaoService
 
     public function historico(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM viacao_historico ");
+        $stmt = $this->pdo->query("SELECT * FROM viacoes_historico ");
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -125,26 +125,70 @@ final class ViacaoService
         $stmt->execute(['id' => $id]);
     }
 
-
+//aqui esta meu tratamento de uploads
     private function uploadFile(array $file): string
     {
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        // Verifica erro no upload, caso tenha mostra mensagem
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new \RuntimeException('Erro no upload do arquivo.');
+        }
 
-        $nomeNovo = uniqid() . '.' . $extension;
+        // Limite de tamanho (2MB)
+        $maxSize = 2 * 1024 * 1024;
 
+        if ($file['size'] > $maxSize) {
+            throw new \RuntimeException('Arquivo muito grande.');
+        }
+
+        // Extensões permitidas
+        $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp'];
+
+        $extension = strtolower(
+            pathinfo($file['name'], PATHINFO_EXTENSION)
+        );
+
+        if (!in_array($extension, $extensoesPermitidas, true)) {
+            throw new \RuntimeException('Extensão não permitida.');
+        }
+
+        // Valida MIME type REAL do arquivo
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+
+        $mime = $finfo->file($file['tmp_name']);
+
+        $mimesPermitidos = [
+            'image/jpeg',
+            'image/png',
+            'image/webp'
+        ];
+
+        if (!in_array($mime, $mimesPermitidos, true)) {
+            throw new \RuntimeException('Tipo de arquivo inválido.');
+        }
+
+        //isso vai validar para ver se a imagem é real:
+        if (getimagesize($file['tmp_name']) === false) {
+            throw new \RuntimeException('Arquivo não é uma imagem válida.');
+        }
+
+        // Gera nome seguro
+        $nomeNovo = bin2hex(random_bytes(16)) . '.' . $extension;
+
+        // Pasta de upload
         $pasta = __DIR__ . '/../public/uploads/';
 
+        // Cria pasta com permissão mais segura
         if (!is_dir($pasta)) {
-            mkdir($pasta, 0777, true);
+            mkdir($pasta, 0755, true);
         }
 
         $destino = $pasta . $nomeNovo;
 
+        // Move arquivo
         if (!move_uploaded_file($file['tmp_name'], $destino)) {
-            throw new \RuntimeException('Falha ao mover o arquivo enviado.');
+            throw new \RuntimeException('Falha ao mover o arquivo.');
         }
 
-        // Retorna o caminho público para salvar no banco
-        return  $nomeNovo;
+        return $nomeNovo;
     }
 }
