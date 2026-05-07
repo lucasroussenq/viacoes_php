@@ -67,22 +67,36 @@ final class ViacaoService
     }
 
     /** Cria uma marca e retorna o id gerado. */
-    public function create(string $nome, ?string $url , ?string $cidade, ?string $logo, bool $status): int
-    {
+    public function create(
+        string $nome,
+        string $url,
+        ?string $cidade,
+        int $status,
+        ?array $file = null
+    ): int {
+
+        $logo = null;
+
+        if ($file && isset($file['name']) && $file['name'] !== '') {
+            $logo = $this->uploadFile($file);
+        }
+
         $stmt = $this->pdo->prepare(
-            'INSERT INTO viacoes (nome, url, cidade, logo, status) VALUES (:nome, :url, :cidade, :logo, :status)'
+            'INSERT INTO viacoes 
+            (nome, url, cidade, status, logo)
+            VALUES
+            (:nome, :url, :cidade, :status, :logo)'
         );
 
         $stmt->execute([
-            'nome' => $nome,
-            'url'=> $url,
+            'nome'   => $nome,
+            'url'    => $url,
             'cidade' => $cidade,
-            'logo' => $logo,
             'status' => $status ? 1 : 0,
+            'logo'   => $logo
         ]);
-
-        return (int) $this->pdo->lastInsertId();
-    }
+                return (int)$this->pdo->lastInsertId();
+            }
 
     /** Atualiza os campos de uma marca existente.
      * @param string|null $logo
@@ -97,7 +111,7 @@ final class ViacaoService
         $stmt->execute([
             'id' => $id,
             'nome' => $nome,
-            'url'=> $url,
+            'url' => $url,
             'cidade' => $cidade,
             'logo' => $logo,
             'status' => $status ? 1 : 0,
@@ -109,5 +123,28 @@ final class ViacaoService
     {
         $stmt = $this->pdo->prepare('DELETE FROM viacoes WHERE id = :id');
         $stmt->execute(['id' => $id]);
+    }
+
+
+    private function uploadFile(array $file): string
+    {
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+
+        $nomeNovo = uniqid() . '.' . $extension;
+
+        $pasta = __DIR__ . '/../public/uploads/';
+
+        if (!is_dir($pasta)) {
+            mkdir($pasta, 0777, true);
+        }
+
+        $destino = $pasta . $nomeNovo;
+
+        if (!move_uploaded_file($file['tmp_name'], $destino)) {
+            throw new \RuntimeException('Falha ao mover o arquivo enviado.');
+        }
+
+        // Retorna o caminho público para salvar no banco
+        return '/uploads/' . $nomeNovo;
     }
 }

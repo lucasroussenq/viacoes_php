@@ -1,5 +1,12 @@
+<form
+        method="post"
+        action="<?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>"
+        enctype="multipart/form-data"
+>
+    <?php if ($method !== null): ?>
+        <input type="hidden" name="_method" value="<?= htmlspecialchars($method, ENT_QUOTES, 'UTF-8') ?>">
+    <?php endif; ?>
 
-<form method="post" action="/viacoes">
     <div>
         <label for="viacao">Nome da marca</label><br>
         <input
@@ -26,7 +33,8 @@
 
     <div>
         <label for="cidade">cidade</label><br>
-        <input id="cidade" name="cidade" ><?= htmlspecialchars($old['cidade'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+        <input id="cidade" name="cidade" value="<?= htmlspecialchars($old['cidade'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+
     </div>
 
     <div>

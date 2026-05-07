@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\View;
 use App\Services\ViacaoService;
+use PDOException;
 
 /** Controla o fluxo HTTP de marcas e delega persistencia ao ViacaoService. */
 final class HomeController

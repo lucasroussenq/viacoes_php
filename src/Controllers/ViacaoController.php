@@ -52,38 +52,39 @@ final class ViacaoController
     public function store(): void
     {
         $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
-        $url = trim((string) ($_POST['url'] ?? ''));
-        $cidade = trim((string) ($_POST['cidade'] ?? ''));
-        $logo = trim((string) ($_POST['logo'] ?? ''));
-        $status = isset($_POST['status']) && (string) $_POST['status'] === '1';
+        $url        = trim((string) ($_POST['url'] ?? ''));
+        $cidade     = trim((string) ($_POST['cidade'] ?? ''));
+        $status     = (isset($_POST['status']) && $_POST['status'] === '1') ? 1 : 0;
 
         $errors = $this->validate($nomeViacao);
 
         if ($errors !== []) {
             View::render('viacoes/create', [
-                'title' => 'Criar viacao',
+                'title'  => 'Criar viacao',
                 'errors' => $errors,
-                'old' => [
-                    'nome' => $nomeViacao,
-                    'url' => $url,
+                'old'    => [
+                    'nome'   => $nomeViacao,
+                    'url'    => $url,
                     'cidade' => $cidade,
-                    'logo' => $logo,
+                    'logo'   => '',
                     'status' => $status,
                 ],
             ]);
             return;
         }
 
+        // Passa $_FILES['logo'] direto — o Service cuida do upload
+        $file = (!empty($_FILES['logo']['name'])) ? $_FILES['logo'] : null;
+
         $id = $this->viacaoService->create(
             $nomeViacao,
             $url,
             $cidade,
-            $logo,
-            $status
-
+            $status,
+            $file           // ?array — correto agora
         );
 
-        View::flash('success', 'viação criada com sucesso (#' . $id . ').');
+        View::flash('success', 'Viação criada com sucesso (#' . $id . ').');
         View::redirect('/viacoes');
     }
 
@@ -192,4 +193,7 @@ final class ViacaoController
 
         return $errors;
     }
+
+
+
 }

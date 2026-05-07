@@ -5,7 +5,7 @@ declare(strict_types=1);
 /** @var list<string> $errors */
 /** @var array{nome: string, cidade: string, status: bool, url: string, logo: string} $old */
 
-$action = "/viacoes/store";
+$action = "/viacoes";
 $method = null;
 $viacao = null;
 ?>

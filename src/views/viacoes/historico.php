@@ -1,4 +1,9 @@
 <?php
+
+
+//esse arquivo não está implementado!!
+
+
 declare(strict_types=1);
  ?>
 

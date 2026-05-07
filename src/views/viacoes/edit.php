@@ -8,14 +8,12 @@ use App\Models\Viacao;
 /** @var list<string> $errors */
 /** @var array{nome: string, cidade: string, status: bool} $old */
 
-$action = "/viacoes/{id}";
+$action = "/viacoes/{$viacao->id}";
 $method = "PUT";
 $old = $old ?? [];
 ?>
 
 <h1>Editar viacao #<?= (int) $viacao->id ?></h1>
-
-<?php require __DIR__ . '/form.php'; ?>
 
 <?php if ($errors !== []): ?>
     <div class="alert alert--danger">
@@ -27,3 +25,5 @@ $old = $old ?? [];
         </ul>
     </div>
 <?php endif; ?>
+
+<?php require __DIR__ . '/form.php'; ?>

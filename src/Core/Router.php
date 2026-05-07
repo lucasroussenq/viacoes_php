@@ -24,6 +24,12 @@ final class Router
         $this->add('POST', $pattern, $handler);
     }
 
+    public function put(string $pattern, callable|array $handler): void
+    {
+        $this->add('PUT', $pattern, $handler);
+    }
+
+
     /** Adiciona uma rota na tabela interna e converte pattern para regex. */
     private function add(string $method, string $pattern, callable|array $handler): void
     {
@@ -41,6 +47,13 @@ final class Router
     /** Resolve a rota e executa o handler correspondente. */
     public function dispatch(string $method, string $uri): void
     {
+        if ($method === 'POST' && isset($_POST['_method'])) {
+            $override = strtoupper($_POST['_method']);
+            if (in_array($override, ['PUT', 'PATCH', 'DELETE'], true)) {
+                $method = $override;
+            }
+        }
+
         $method = strtoupper($method);
         $path = parse_url($uri, PHP_URL_PATH);
         $path = is_string($path) ? $path : '/';
