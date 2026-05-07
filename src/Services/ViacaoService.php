@@ -145,6 +145,6 @@ final class ViacaoService
         }
 
         // Retorna o caminho público para salvar no banco
-        return '/uploads/' . $nomeNovo;
+        return  $nomeNovo;
     }
 }

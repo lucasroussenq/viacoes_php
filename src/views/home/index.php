@@ -126,7 +126,7 @@ use App\Models\Viacao;
                     <div class="wrapper">
                         <div class="box">
                             <?php if (!empty($v->logo)): ?>
-                                <img src="<?= htmlspecialchars($v->logo) ?>"
+                                <img src="uploads/<?= htmlspecialchars($v->logo) ?>"
                                      alt="<?= htmlspecialchars($v->nome) ?>"
                                      width="110" height="44">
                             <?php else: ?>

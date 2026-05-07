@@ -30,6 +30,17 @@ final class ViacaoController
         ]);
     }
 
+    /** Exibe o histórico de edições de viações. */
+    public function historico(): void
+    {
+        $historico = $this->viacaoService->historico();
+
+        View::render('viacoes/historico', [
+            'title' => 'Histórico de viações',
+            'historico' => $historico,
+        ]);
+    }
+
 
 
     /** Exibe o formulario de criacao. */
@@ -154,7 +165,7 @@ final class ViacaoController
             $cidade,
             $status,
             $url,
-           $logo
+            $logo
         );
 
         View::flash('success', 'viacao atualizada com sucesso.');
