@@ -16,16 +16,19 @@ $flash = View::pullFlash();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars($title ?? 'Task App', ENT_QUOTES, 'UTF-8') ?></title>
     <link rel="stylesheet" href="/app.css">
+    <!-- Assuming home.css is also loaded on pages using this layout if needed -->
+    <link rel="stylesheet" href="/home.css">
 </head>
 <body>
 <header>
-    <nav>
-        <a href="/tasks">Tasks</a>
-        | <a href="/tasks/create">Nova task</a>
-        | <a href="/viacoes">Viacoes</a>
-        | <a href="/viacoes/create">Nova viacao</a>
-
-    </nav>
+    <div class="container">
+        <nav>
+            <a href="/tasks">Tasks</a>
+            | <a href="/tasks/create">Nova task</a>
+            | <a href="/viacoes">Viacoes</a>
+            | <a href="/viacoes/create">Nova viacao</a>
+        </nav>
+    </div>
 </header>
 
 <?php if ($flash !== null): ?>
@@ -38,7 +41,9 @@ $flash = View::pullFlash();
 <?php endif; ?>
 
 <main>
-    <?= $content ?>
+    <div class="container">
+        <?= $content ?>
+    </div>
 </main>
 </body>
 </html>

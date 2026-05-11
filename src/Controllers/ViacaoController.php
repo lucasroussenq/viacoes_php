@@ -54,7 +54,7 @@ final class ViacaoController
                 'url' => '',
                 'cidade' => '',
                 'logo' => '',
-                'status' => false,
+                'status' => true,
             ],
         ]);
     }
@@ -67,7 +67,7 @@ final class ViacaoController
         $cidade     = trim((string) ($_POST['cidade'] ?? ''));
         $status     = (isset($_POST['status']) && $_POST['status'] === '1') ? 1 : 0;
 
-        $errors = $this->validate($nomeViacao);
+        $errors = $this->validateName($nomeViacao);
 
         if ($errors !== []) {
             View::render('viacoes/create', [
@@ -127,37 +127,39 @@ final class ViacaoController
     /** Processa o POST de atualizacao. */
     public function update(int $id): void
     {
-        $nome = $this->viacaoService->find($id);
+        $viacaoEditar = $this->viacaoService->find($id);
 
-        if ($nome === null) {
+        if ($viacaoEditar === null) {
             http_response_code(404);
             echo 'viação não encontrada.';
             return;
         }
 
         $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
-        $url = trim((string) ($_POST['url'] ?? ''));
-        $cidade = trim((string) ($_POST['cidade'] ?? ''));
-        $logo = trim((string) ($_POST['logo'] ?? ''));
-        $status = isset($_POST['status']) && (string) $_POST['status'] === '1';
+        $url        = trim((string) ($_POST['url'] ?? ''));
+        $cidade     = trim((string) ($_POST['cidade'] ?? ''));
+        $logo     = trim((string) ($_POST['logo'] ?? ''));
+        $status     = isset($_POST['status']) && (string) $_POST['status'] === '1';
 
-        $errors = $this->validate($nomeViacao);
+        $errors = $this->validateName($nomeViacao);
 
         if ($errors !== []) {
             View::render('viacoes/edit', [
-                'title' => 'Editar viacao',
-                'viacao' => $nome,
+                'title'  => 'Editar viacao',
+                'viacao' => $viacaoEditar,
                 'errors' => $errors,
-                'old' => [
-                    'nome' => $nomeViacao,
-                    'logo' => $logo,
+                'old'    => [
+                    'nome'   => $nomeViacao,
+                    'logo'   => $viacaoEditar->logo ?? '',
                     'status' => $status,
-                    'url' => $url,
+                    'url'    => $url,
                     'cidade' => $cidade,
                 ],
             ]);
             return;
         }
+
+        $file = (!empty($_FILES['logo']['name'])) ? $_FILES['logo'] : null;
 
         $this->viacaoService->update(
             $id,
@@ -165,13 +167,12 @@ final class ViacaoController
             $cidade,
             $status,
             $url,
-            $logo
+            $file
         );
 
         View::flash('success', 'viacao atualizada com sucesso.');
         View::redirect('/viacoes');
     }
-
     /** Remove uma marca via POST para evitar delete por GET. */
     public function destroy(int $id): void
     {
@@ -190,7 +191,7 @@ final class ViacaoController
     }
 
     /** @return list<string> Retorna erros de validacao do nome da marca. */
-    private function validate(string $NomeViacao): array
+    private function validateName(string $NomeViacao): array
     {
         $errors = [];
 

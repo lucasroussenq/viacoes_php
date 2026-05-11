@@ -54,10 +54,10 @@ nav a:hover {
 
 main {
 
-    max-width: 100%;
-    margin: 18px 0;
-    padding: 0 16px 24px;
-  }
+  max-width: 100%;
+  margin: 18px 0;
+  padding: 0 16px 24px;
+}
 
 
 h1 {
@@ -82,7 +82,7 @@ table {
 }
 
 table th,
- table td {
+table td {
   padding: 10px 12px;
   border-bottom: 1px solid var(--border);
   text-align: left;

@@ -15,7 +15,6 @@ $router->get('/tasks', [TaskController::class, 'index']);
 
 $router->get('/tasks/create', [TaskController::class, 'create']);
 $router->post('/tasks', [TaskController::class, 'store']);
-
 $router->get('/tasks/{id}/edit', [TaskController::class, 'edit']);
 $router->post('/tasks/{id}', [TaskController::class, 'update']);
 $router->post('/tasks/{id}/delete', [TaskController::class, 'destroy']);

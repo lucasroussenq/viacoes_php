@@ -78,7 +78,7 @@ final class ViacaoService
         $logo = null;
 
         if ($file && isset($file['name']) && $file['name'] !== '') {
-            $logo = $this->uploadFile($file);
+            $logo = $this->validateFile($file);
         }
 
         $stmt = $this->pdo->prepare(
@@ -102,18 +102,37 @@ final class ViacaoService
      * @param string|null $logo
      * @param string|null $url
      */
-    public function update(int $id, string $nome, ?string $cidade, bool $status, ?string $url, ?string $logo): void
-    {
+    public function update(
+        int $id,
+        string $nome,
+        ?string $cidade,
+        bool $status,
+        ?string $url,
+        ?array $file = null
+    ): void {
+
+        // 1. SELECT separado para buscar logo atual
+        $stmt = $this->pdo->prepare('SELECT logo FROM viacoes WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+        $registro = $stmt->fetch();
+        $logoAtual = $registro['logo']; // guarda a logo atual
+
+        $logo = $logoAtual;
+        if ($file && isset($file['name']) && $file['name'] !== '') {
+            $logo = $this->validateFile($file); // ✅ reutiliza o método que já existe
+        }
+
+        // 3. UPDATE separado
         $stmt = $this->pdo->prepare(
             'UPDATE viacoes SET nome = :nome, url = :url, cidade = :cidade, logo = :logo, status = :status WHERE id = :id'
         );
 
         $stmt->execute([
-            'id' => $id,
-            'nome' => $nome,
-            'url' => $url,
+            'id'     => $id,
+            'nome'   => $nome,
+            'url'    => $url,
             'cidade' => $cidade,
-            'logo' => $logo,
+            'logo'   => $logo,
             'status' => $status ? 1 : 0,
         ]);
     }
@@ -126,7 +145,8 @@ final class ViacaoService
     }
 
 //aqui esta meu tratamento de uploads
-    private function uploadFile(array $file): string
+// deve ser usado tanto no create tanto no edit
+    private function validateFile(array $file): string
     {
         // Verifica erro no upload, caso tenha mostra mensagem
         if ($file['error'] !== UPLOAD_ERR_OK) {
@@ -141,7 +161,7 @@ final class ViacaoService
         }
 
         // Extensões permitidas
-        $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp'];
+        $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
 
         $extension = strtolower(
             pathinfo($file['name'], PATHINFO_EXTENSION)
@@ -159,7 +179,8 @@ final class ViacaoService
         $mimesPermitidos = [
             'image/jpeg',
             'image/png',
-            'image/webp'
+            'image/webp',
+            'image/svg+xml'
         ];
 
         if (!in_array($mime, $mimesPermitidos, true)) {

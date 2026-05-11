@@ -8,43 +8,45 @@ use App\Models\Viacao;
 
 ?>
 
-<h1>Marcas</h1>
+<div class="container">
+    <h1>Marcas</h1>
 
-<p><a href="/home">home</a></p>
+    <p><a href="/home">home</a></p>
 
-<p><a href="/viacoes/create">Criar viação</a></p>
+    <p><a href="/viacoes/create">Criar viação</a></p>
 
-<p><a href="/viacoes/historico">Historico viação</a></p>
+    <p><a href="/viacoes/historico">Historico viação</a></p>
 
-<?php if (count($viacoes) === 0): ?>
-    <p>Nenhuma viação cadastrada.</p>
-<?php else: ?>
-    <table border="1" cellpadding="6" cellspacing="0">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Cidade</th>
-            <th>logo</th>
-            <th>link</th>
-            <th>Status</th>
-            <th>Criada em</th>
-            <th>Ações</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($viacoes as $viacao): ?>
-            <tr>
-                <td><?= (int) $viacao->id ?></td>
-                <td><?= htmlspecialchars($viacao->nome, ENT_QUOTES, 'UTF-8') ?></td>
-                <td><?= $viacao->cidade ?></td>
-                <td><?= $viacao->logo ?></td>
-                <td><?= $viacao->url ?></td>
-                <td><?= $viacao->status ? 'ativo' : 'inativo' ?></td>
-                <td><?= htmlspecialchars($viacao->data_criacao, ENT_QUOTES, 'UTF-8') ?></td>
-                <td>
-                    <span class="actions">
-                        <a href="/viacoes/<?= (int) $viacao->id ?>/edit">Editar</a>
+    <?php if (count($viacoes) === 0): ?>
+        <p>Nenhuma viação cadastrada.</p>
+    <?php else: ?>
+        <div class="table-responsive">
+            <table border="1" cellpadding="6" cellspacing="0">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cidade</th>
+                    <th>Logo</th>
+                    <th>Link</th>
+                    <th>Status</th>
+                    <th>Criada em</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($viacoes as $viacao): ?>
+                    <tr>
+                        <td><?= (int) $viacao->id ?></td>
+                        <td><?= htmlspecialchars($viacao->nome, ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($viacao->cidade, ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($viacao->logo, ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><a href="<?= htmlspecialchars($viacao->url, ENT_QUOTES, 'UTF-8') ?>" target="_blank"><?= htmlspecialchars($viacao->url, ENT_QUOTES, 'UTF-8') ?></a></td>
+                        <td><?= $viacao->status ? 'ativo' : 'inativo' ?></td>
+                        <td><?= htmlspecialchars($viacao->data_criacao, ENT_QUOTES, 'UTF-8') ?></td>
+                        <td>
+                            <span class="actions">
+                                <a href="/viacoes/<?= (int) $viacao->id ?>/edit">Editar</a>
 
                         <form method="post" action="/viacoes/<?= (int) $viacao->id ?>/delete" onsubmit="return confirm('Remover esta marca?');">
                             <button type="submit">Excluir</button>

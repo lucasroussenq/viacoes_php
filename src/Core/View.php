@@ -10,8 +10,11 @@ final class View
     /** @param array<string, mixed> $data Dados passados para a view. */
     public static function render(string $view, array $data = []): void
     {
+        // Define o caminho base do projeto (pasta src)
         $basePath = dirname(__DIR__);
+        // Define o caminho para o arquivo específico da view
         $viewFile = $basePath . '/views/' . $view . '.php';
+        // Define o caminho para o layout principal que envolve a view
         $layoutFile = $basePath . '/views/_layout.php';
 
         if (!is_file($viewFile)) {
@@ -26,9 +29,12 @@ final class View
             return;
         }
 
+        // Transforma chaves do array em variáveis locais (ex: ['nome' => 'João'] vira $nome)
         extract($data, EXTR_SKIP);
 
+        // Inicia o buffer de saída: nada é enviado ao navegador ainda, fica guardado na memória
         ob_start();
+        // Executa o arquivo da view, que agora tem acesso às variáveis extraídas acima
         require $viewFile;
         $content = (string) ob_get_clean();
 
