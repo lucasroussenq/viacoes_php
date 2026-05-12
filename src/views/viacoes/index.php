@@ -40,7 +40,7 @@ use App\Models\Viacao;
                         <td><?= (int) $viacao->id ?></td>
                         <td><?= htmlspecialchars($viacao->nome, ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars($viacao->cidade, ENT_QUOTES, 'UTF-8') ?></td>
-                        <td><?= htmlspecialchars($viacao->logo, ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?=$viacao->logo, ENT_QUOTES, 'UTF-8' ?></td>
                         <td><a href="<?= htmlspecialchars($viacao->url, ENT_QUOTES, 'UTF-8') ?>" target="_blank"><?= htmlspecialchars($viacao->url, ENT_QUOTES, 'UTF-8') ?></a></td>
                         <td><?= $viacao->status ? 'ativo' : 'inativo' ?></td>
                         <td><?= htmlspecialchars($viacao->data_criacao, ENT_QUOTES, 'UTF-8') ?></td>

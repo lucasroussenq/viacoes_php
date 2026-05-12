@@ -138,7 +138,7 @@ final class ViacaoController
         $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
         $url        = trim((string) ($_POST['url'] ?? ''));
         $cidade     = trim((string) ($_POST['cidade'] ?? ''));
-        $logo     = trim((string) ($_POST['logo'] ?? ''));
+        $file     = trim((string) ($_POST['logo'] ?? ''));
         $status     = isset($_POST['status']) && (string) $_POST['status'] === '1';
 
         $errors = $this->validateName($nomeViacao);

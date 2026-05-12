@@ -68,7 +68,7 @@ final class ViacaoService
 
     /** Cria uma marca e retorna o id gerado. */
     public function create(
-        string $nome,
+        ?string $nome,
         string $url,
         ?string $cidade,
         int $status,
