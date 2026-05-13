@@ -47,6 +47,7 @@ final class Router
     /** Resolve a rota e executa o handler correspondente. */
     public function dispatch(string $method, string $uri): void
     {
+        // Method Spoofing: Permite que formulários HTML (que só suportam GET/POST) simulem PUT ou DELETE
         if ($method === 'POST' && isset($_POST['_method'])) {
             $override = strtoupper($_POST['_method']);
             if (in_array($override, ['PUT', 'PATCH', 'DELETE'], true)) {
@@ -60,6 +61,7 @@ final class Router
         $path = $this->normalizePath($path);
 
         foreach ($this->routes[$method] ?? [] as $route) {
+            // Verifica se a URL atual bate com a expressão regular da rota (ex: /tasks/(\d+))
             $matches = [];
             if (preg_match($route['regex'], $path, $matches) !== 1) {
                 continue;
@@ -67,6 +69,7 @@ final class Router
 
             $params = [];
             foreach ($matches as $key => $value) {
+                // Extrai apenas os grupos nomeados da Regex (ex: 'id')
                 if (!is_string($key)) {
                     continue;
                 }

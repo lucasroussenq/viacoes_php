@@ -17,6 +17,7 @@ final class View
         // Define o caminho para o layout principal que envolve a view
         $layoutFile = $basePath . '/views/_layout.php';
 
+
         if (!is_file($viewFile)) {
             http_response_code(500);
             echo 'View não encontrada: ' . htmlspecialchars($view, ENT_QUOTES, 'UTF-8');

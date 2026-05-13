@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="layout.css">
+
 <div class="container">
     <form
             method="post"
@@ -109,14 +111,14 @@
 
     .form-help-text {
         font-size: var(--font-size-p); /* Use responsive font size */
-        color: var(--muted); /* Use muted color variable */
+        color: var(--color-text-muted); /* Use muted color variable */
         margin-top: var(--spacing-xs);
         margin-bottom: 0;
     }
 
     .logo-preview {
         margin-bottom: var(--spacing-sm);
-        border: 1px solid var(--border); /* Use border variable */
+        border: 1px solid var(--border-color); /* Use border variable */
         display: inline-block; /* To contain the image properly */
         padding: 4px; /* Small padding around the image */
         border-radius: 4px;

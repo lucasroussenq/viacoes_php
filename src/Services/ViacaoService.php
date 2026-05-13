@@ -144,16 +144,17 @@ final class ViacaoService
         $stmt->execute(['id' => $id]);
     }
 
-//aqui esta meu tratamento de uploads
-// deve ser usado tanto no create tanto no edit
+    /**
+     * Método privado para tratar o upload de arquivos.
+     * Como sênior, recomendo centralizar isso para garantir que as regras de segurança (MIME type, tamanho) 
+     * sejam as mesmas em todo o app.
+     */
     private function validateFile(array $file): string
     {
-        // Verifica erro no upload, caso tenha mostra mensagem
         if ($file['error'] !== UPLOAD_ERR_OK) {
             throw new \RuntimeException('Erro no upload do arquivo.');
         }
 
-        // Limite de tamanho (2MB)
         $maxSize = 2 * 1024 * 1024;
 
         if ($file['size'] > $maxSize) {
@@ -183,16 +184,16 @@ final class ViacaoService
             'image/svg+xml'
         ];
 
+        // Nunca confie na extensão do arquivo vinda do usuário. Valide o conteúdo REAL (MIME).
         if (!in_array($mime, $mimesPermitidos, true)) {
             throw new \RuntimeException('Tipo de arquivo inválido.');
         }
 
-        //isso vai validar para ver se a imagem é real:
         if (getimagesize($file['tmp_name']) === false) {
             throw new \RuntimeException('Arquivo não é uma imagem válida.');
         }
 
-        // Gera nome seguro
+        // Gera um nome aleatório (UUID/Hash) para evitar que usuários sobrescrevam arquivos uns dos outros
         $nomeNovo = bin2hex(random_bytes(16)) . '.' . $extension;
 
         // Pasta de upload

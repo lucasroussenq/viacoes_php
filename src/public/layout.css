@@ -92,7 +92,7 @@ h1 {
    LAYOUT
    ============================================================ */
 .container {
-  max-width: 960px;
+  max-width: 1200px;
   margin: auto;
   padding: 20px;
   background: var(--color-bg-surface);

@@ -15,9 +15,9 @@ $flash = View::pullFlash();
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars($title ?? 'Task App', ENT_QUOTES, 'UTF-8') ?></title>
-    <link rel="stylesheet" href="/app.css">
+    <link rel="stylesheet" href="/layout.css">
     <!-- Assuming home.css is also loaded on pages using this layout if needed -->
-    <link rel="stylesheet" href="/home.css">
+
 </head>
 <body>
 <header>
