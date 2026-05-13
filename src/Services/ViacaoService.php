@@ -98,6 +98,7 @@ final class ViacaoService
                 return (int)$this->pdo->lastInsertId();
             }
 
+
     /** Atualiza os campos de uma marca existente.
      * @param string|null $logo
      * @param string|null $url
@@ -146,7 +147,7 @@ final class ViacaoService
 
     /**
      * Método privado para tratar o upload de arquivos.
-     * Como sênior, recomendo centralizar isso para garantir que as regras de segurança (MIME type, tamanho) 
+     * Como sênior, recomendo centralizar isso para garantir que as regras de segurança (MIME type, tamanho)
      * sejam as mesmas em todo o app.
      */
     private function validateFile(array $file): string
@@ -184,7 +185,7 @@ final class ViacaoService
             'image/svg+xml'
         ];
 
-        // Nunca confie na extensão do arquivo vinda do usuário. Valide o conteúdo REAL (MIME).
+        // Nunca confiar na extensão do arquivo vinda do usuário. Valide o conteúdo REAL (MIME).
         if (!in_array($mime, $mimesPermitidos, true)) {
             throw new \RuntimeException('Tipo de arquivo inválido.');
         }

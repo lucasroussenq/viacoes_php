@@ -6,6 +6,7 @@ declare(strict_types=1);
 use App\Controllers\TaskController;
 use App\Controllers\ViacaoController;
 use App\Controllers\HomeController;
+use App\Controllers\UsuarioController;
 
 
 /** @var App\Core\Router $router */
@@ -29,3 +30,7 @@ $router->put('/viacoes/{id}', [ViacaoController::class, 'update']);
 $router->post('/viacoes/{id}/delete', [ViacaoController::class, 'destroy']);
 
 $router->get('/home', [HomeController::class, 'index']);
+
+$router->post('/login', [UsuarioController::class, 'login']);
+$router->get('/downgrade-acesso', [UsuarioController::class, 'downgrade']);
+$router->get('/upgrade-acesso', [UsuarioController::class, 'upgrade']);

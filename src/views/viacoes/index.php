@@ -17,6 +17,11 @@ use App\Models\Viacao;
         <a href="/viacoes/create" class="btn btn-primary">
             + Criar viação
         </a>
+        <?php if (isset($_SESSION['user_nivel']) && $_SESSION['user_nivel'] === 1): ?>
+            <div class="modoADM">
+                <strong>Você é administrador</strong>
+            </div>
+        <?php endif; ?>
     </header>
 
     <?php if (count($viacoes) === 0): ?>

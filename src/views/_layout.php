@@ -27,13 +27,15 @@ $flash = View::pullFlash();
             | <a href="/tasks/create">Nova task</a>
             | <a href="/viacoes">Viacoes</a>
             | <a href="/viacoes/create">Nova viacao</a>
+            | <a href="/upgrade-acesso">Login admim</a>
+            | <a href="/downgrade-acesso">login comum</a>
         </nav>
     </div>
 </header>
 
 <?php if ($flash !== null): ?>
-    <div class="flash">
-        <div class="flash__box flash__box--<?= htmlspecialchars($flash['type'], ENT_QUOTES, 'UTF-8') ?>">
+    <div>
+        <div = htmlspecialchars($flash['type'], ENT_QUOTES, 'UTF-8') ?>">
             <strong><?= htmlspecialchars(strtoupper($flash['type']), ENT_QUOTES, 'UTF-8') ?>:</strong>
             <?= htmlspecialchars($flash['message'], ENT_QUOTES, 'UTF-8') ?>
         </div>

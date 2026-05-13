@@ -1,4 +1,5 @@
 <?php
+//relaçoes de conexao
 
 declare(strict_types=1);
 
@@ -10,7 +11,11 @@ $path = is_string($path) ? $path : '/';
 
 // Não inicia sessão para rotas de API (melhora performance e isolamento)
 if (!str_starts_with($path, '/api')) {
-	session_start();
+    session_start();
+    if (!isset($_SESSION ['usuarios_id'])) {
+        $_SESSION = ['usuarios_id' => 1];
+        $_SESSION['usuarios_nivel'] = 1;
+    }
 }
 
 // Autoload do Composer: carrega todas as classes do projeto automaticamente via PSR-4
@@ -27,3 +32,6 @@ require __DIR__ . '/../routes/api.php';
 $method = (string)($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
 $router->dispatch($method, $uri);
+
+//conexao
+
