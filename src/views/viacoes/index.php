@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 use App\Models\Viacao;
+
 /** @var list<Viacao> $viacoes */
+
 ?>
+<link rel="stylesheet" href="/css/layout.css">
 
 <main class="container">
     <header class="page-header">

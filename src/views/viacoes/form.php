@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="layout.css">
+<link rel="stylesheet" href="/css/layout.css">
 
 <div class="container">
     <form
@@ -44,18 +44,17 @@
             >
         </div>
 
-
-
         <div class="form-group">
-            <label for="logo_file">Logo </label>
+            <label for="logo_file">Logo</label>
 
             <?php if (!empty($old['logo'])): ?>
                 <div class="logo-preview">
-                    <!-- Correção: 'echo' adicionado e barra extra removida -->
-                    <img src="src/public/uploads/<?= $viacao->logo; ?>" alt="Logo atual">
+                    <img
+                            src="/uploads/<?= htmlspecialchars($old['logo'], ENT_QUOTES, 'UTF-8') ?>"
+                            alt="Logo atual"
+                    >
                 </div>
             <?php endif; ?>
-
 
             <input type="hidden" name="logo_atual" value="<?= htmlspecialchars($old['logo'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
@@ -65,9 +64,7 @@
                     name="logo"
                     accept="image/png, image/jpeg, image/svg+xml"
             >
-            <p class="form-help-text">
-                PNG, JPG ou SVG. A imagem será exibida em 160×60 px.
-            </p>
+            <p class="form-help-text">PNG, JPG ou SVG. A imagem será exibida em 160×60 px.</p>
         </div>
 
         <div class="form-group">
@@ -98,4 +95,3 @@
         <button type="submit">Salvar</button>
     </form>
 </div>
-

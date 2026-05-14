@@ -5,14 +5,13 @@ declare(strict_types=1);
 /** @var list<string> $errors */
 /** @var array{nome: string, cidade: string, status: bool, url: string, logo: string} $old */
 
-$action = "/viacoes";
-$method = null;
-$viacao = null;
+$action  = "/viacoes";
+$method  = null;
+$viacao  = null;
+$old     = $old ?? [];
 ?>
 
-
-<h1>Criar marca</h1>
-<?php require __DIR__ . '/form.php'; ?>
+    <h1>Criar marca</h1>
 
 <?php if ($errors !== []): ?>
     <div class="alert alert--danger">
@@ -25,3 +24,4 @@ $viacao = null;
     </div>
 <?php endif; ?>
 
+<?php require __DIR__ . '/form.php'; ?>

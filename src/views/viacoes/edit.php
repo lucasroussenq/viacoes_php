@@ -6,14 +6,14 @@ use App\Models\Viacao;
 
 /** @var Viacao $viacao */
 /** @var list<string> $errors */
-/** @var array{nome: string, cidade: string, status: bool} $old */
+/** @var array{nome: string, cidade: string, status: bool, url: string, logo: string} $old */
 
 $action = "/viacoes/{$viacao->id}";
 $method = "PUT";
-$old = $old ?? [];
+$old    = $old ?? [];
 ?>
 
-<h1>Editar viacao #<?= (int) $viacao->id ?></h1>
+    <h1>Editar viação #<?= (int) $viacao->id ?></h1>
 
 <?php if ($errors !== []): ?>
     <div class="alert alert--danger">
