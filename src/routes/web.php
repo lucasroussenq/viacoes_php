@@ -10,7 +10,7 @@ use App\Controllers\UsuarioController;
 
 
 /** @var App\Core\Router $router */
-
+/*
 $router->get('/', [TaskController::class, 'index']);
 $router->get('/tasks', [TaskController::class, 'index']);
 
@@ -18,7 +18,7 @@ $router->get('/tasks/create', [TaskController::class, 'create']);
 $router->post('/tasks', [TaskController::class, 'store']);
 $router->get('/tasks/{id}/edit', [TaskController::class, 'edit']);
 $router->post('/tasks/{id}', [TaskController::class, 'update']);
-$router->post('/tasks/{id}/delete', [TaskController::class, 'destroy']);
+$router->post('/tasks/{id}/delete', [TaskController::class, 'destroy']); */
 
 $router->get('/viacoes', [ViacaoController::class, 'index']);
 $router->get('/viacoes/create', [ViacaoController::class, 'create']);

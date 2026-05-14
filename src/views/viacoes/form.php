@@ -44,17 +44,18 @@
             >
         </div>
 
+
+
         <div class="form-group">
             <label for="logo_file">Logo </label>
 
             <?php if (!empty($old['logo'])): ?>
                 <div class="logo-preview">
-                    <img
-                            src="src/public/uploads//<?php $viacao->logo; ?>"
-                            alt="Logo atual"
-                    >
+                    <!-- Correção: 'echo' adicionado e barra extra removida -->
+                    <img src="src/public/uploads/<?= $viacao->logo; ?>" alt="Logo atual">
                 </div>
             <?php endif; ?>
+
 
             <input type="hidden" name="logo_atual" value="<?= htmlspecialchars($old['logo'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
@@ -98,58 +99,3 @@
     </form>
 </div>
 
-<style>
-    /* Additional styles for form responsiveness */
-    .form-group {
-        margin-bottom: var(--spacing-md); /* Use responsive spacing */
-    }
-
-    .form-group label {
-        margin-bottom: var(--spacing-xs);
-        color: #000000/* Space between label and input */
-    }
-
-    .form-help-text {
-        font-size: var(--font-size-p); /* Use responsive font size */
-        color: var(--color-text-muted); /* Use muted color variable */
-        margin-top: var(--spacing-xs);
-        margin-bottom: 0;
-    }
-
-    .logo-preview {
-        margin-bottom: var(--spacing-sm);
-        border: 1px solid var(--border-color); /* Use border variable */
-        display: inline-block; /* To contain the image properly */
-        padding: 4px; /* Small padding around the image */
-        border-radius: 4px;
-    }
-
-    .logo-preview img {
-        max-width: 160px;
-        height: 60px;
-        object-fit: contain;
-        display: block; /* Remove extra space below image */
-    }
-
-    .radio-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--spacing-md); /* Space between radio options */
-        margin-top: var(--spacing-xs);
-    }
-
-    .radio-group label {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        margin-bottom: 0; /* Override default label margin */
-    }
-
-    /* Adjustments for smaller screens */
-    @media (max-width: 480px) {
-        .radio-group {
-            flex-direction: column; /* Stack radio buttons vertically */
-            gap: var(--spacing-sm);
-        }
-    }
-</style>

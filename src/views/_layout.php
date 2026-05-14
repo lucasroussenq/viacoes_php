@@ -14,21 +14,19 @@ $flash = View::pullFlash();
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= htmlspecialchars($title ?? 'Task App', ENT_QUOTES, 'UTF-8') ?></title>
-    <link rel="stylesheet" href="/layout.css">
+    <title><?= htmlspecialchars($title ?? '', ENT_QUOTES, 'UTF-8') ?></title>
+    <link rel="stylesheet" href="layout.css">
     <!-- Assuming home.css is also loaded on pages using this layout if needed -->
 
 </head>
 <body>
 <header>
-    <div class="container">
-        <nav>
-            <a href="/tasks">Tasks</a>
-            | <a href="/tasks/create">Nova task</a>
-            | <a href="/viacoes">Viacoes</a>
-            | <a href="/viacoes/create">Nova viacao</a>
-            | <a href="/upgrade-acesso">Login admim</a>
-            | <a href="/downgrade-acesso">login comum</a>
+    <div >
+        <nav CLASS="container-nav">
+            | <a class="btn-headerlay" href="/viacoes">Viacoes</a>
+            | <a class="btn-headerlay" href="/viacoes/create">Nova viacao</a>
+            | <a class="btn-headerlay" href="/upgrade-acesso">Login admim</a>
+            | <a class="btn-headerlay" href="/downgrade-acesso">login comum</a> |
         </nav>
     </div>
 </header>

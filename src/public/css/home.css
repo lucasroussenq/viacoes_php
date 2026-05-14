@@ -130,16 +130,11 @@ header {
     z-index: 100;
 }
 
-.header-nav {
-    display: flex;
-    align-items: center;
-    gap: var(--espacamento-g);
-    padding: var(--espacamento-p) var(--espacamento-gg);
-}
 
-.header-nav p { margin: 0; }
 
-.header-nav a {
+.btn-header p { margin: 0; }
+
+.btn-header a {
     color: var(--cor-texto-invertido);
     text-decoration: none;
     font-size: var(--font-size-m);
@@ -152,15 +147,17 @@ header {
     display: block;
     margin-right: var(--espacamento-m);
 }
-
+/*arrumar isso aqui! ::*/
 /* Botões do header */
-.header-nav button {
-    padding: var(--espacamento-pp) 18px;
-    border-radius: var(--radius-p);
+.btn-header {
+    width: 100%;
+    padding: 11px 20px;
+    background-color: var(--color-yellow);
+    color: #e5e5e5;
     border: none;
-    font-size: var(--font-size-defaut);
-    font-weight: 600;
-    cursor: pointer;
+    border-radius: var(--radius-p);
+    font-size: var(--font-size-m);
+
 }
 
 .btn-login {
@@ -175,8 +172,8 @@ header {
 }
 
 /* Logo parceiro (direita do header) */
-.header-nav > div { margin-left: auto; }
-.header-nav > div img { height: 32px; display: block; }
+.btn-header > div { margin-left: auto; }
+.btn-header > div img { height: 32px; display: block; }
 
 
 /*BANNER + FORMULÁRIO DE BUSCA */

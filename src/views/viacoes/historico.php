@@ -11,7 +11,7 @@ declare(strict_types=1);
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/app.css">
     <title>Histórico</title>
 </head>
 <body>
@@ -20,17 +20,20 @@ declare(strict_types=1);
 
     <div class="page-header">
         <h1>Histórico de edições</h1>
-        <a href="/index" class="btn btn-ghost">← Voltar</a>
+        <a href="/viacoes" class="btn btn-ghost">← Voltar</a>
     </div>
 
     <div class="card">
         <table>
             <thead>
             <tr>
-                <th>Viação</th>
+                <th>id</th>
                 <th>Nome anterior</th>
+                <th>Nome atual</th>
                 <th>Cidade anterior</th>
+                <th>Cidade atual</th>
                 <th>Status anterior</th>
+                <th>Status atual</th>
                 <th>Editado em</th>
             </tr>
             </thead>

@@ -15,12 +15,12 @@ use App\Models\Viacao;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="icon.png">
     <title>Quero Passagem</title>
-    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
 
 <header>
-    <nav class="header-nav">
+    <nav class="btn-header">
         <img alt="logo" src="media/logo_nova_grande.png" class="logo">
         <p><a href="#">Passagens</a></p>
         <p><a href="#">Novo!</a></p>

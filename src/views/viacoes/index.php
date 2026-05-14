@@ -9,9 +9,8 @@ use App\Models\Viacao;
         <div>
             <h1>Viação / Marcas</h1>
             <nav class="actions">
-                <a href="/home" class="url-link">Home</a>
-                <span class="muted">•</span>
-                <a href="/viacoes/historico" class="url-link">Histórico</a>
+                <a class="btn btn-primary" href="/home">Home</a>
+                <a class="btn btn-primary"  href="/viacoes/historico">Histórico</a>
             </nav>
         </div>
         <a href="/viacoes/create" class="btn btn-primary">
