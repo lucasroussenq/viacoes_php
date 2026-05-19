@@ -42,14 +42,15 @@ CREATE TABLE IF NOT EXISTS viacoes
 -- TABELA DE HISTÓRICO DE VIAÇÕES
 CREATE TABLE IF NOT EXISTS historico_viacoes
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
-    viacao_id  INT         NOT NULL,
-    usuario_id INT         NOT NULL,
-    acao       VARCHAR(50) NOT NULL,
-    antes      JSON                 DEFAULT NULL,
-    depois     JSON                 DEFAULT NULL,
-    data_criacao TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    viacao_id    INT          NOT NULL,
+    usuario_id   INT          NOT NULL,
+    acao         VARCHAR(50)  NOT NULL,
+    dados        JSON         NOT NULL,
+    data_criacao TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  ) ENGINE = InnoDB
+    INDEX idx_viacao_id  (viacao_id),
+    INDEX idx_usuario_id (usuario_id)
+) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

@@ -51,7 +51,7 @@ use App\Models\Viacao;
                         <td><strong><?= (int) $viacao->id ?></strong></td>
                         <td><?= htmlspecialchars($viacao->nome, ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars($viacao->cidade, ENT_QUOTES, 'UTF-8') ?></td>
-                        <td> <?= htmlspecialchars(substr($viacao->logo, 0, 20), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(substr($viacao?->logo ?? '', 0, 20), ENT_QUOTES, 'UTF-8') ?></td>
                         <td>
                             <a href="<?= htmlspecialchars($viacao->url, ENT_QUOTES, 'UTF-8') ?>"
                                target="_blank" class="url-link">

@@ -20,7 +20,7 @@ final class ViacaoService
 
     public function historico(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM viacoes_historico ");
+        $stmt = $this->pdo->query("SELECT * FROM historico_viacoes ");
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

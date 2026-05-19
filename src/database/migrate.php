@@ -1,2 +1,0 @@
-<?php
-//melhorar depois

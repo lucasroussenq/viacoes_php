@@ -6,17 +6,20 @@ namespace App\Controllers;
 
 use App\Core\View;
 use App\Services\ViacaoService;
+use App\Services\HistoricoService;
 
 /** Controla o fluxo HTTP de marcas e delega persistencia ao ViacaoService. */
 final class ViacaoController
 {
     /** Service usado para consultar e alterar marcas. */
     private ViacaoService $viacaoService;
+    private HistoricoService $historicoService;
 
     /** @param ViacaoService|null $viacoes Permite injecao em testes. */
     public function __construct(?ViacaoService $ViacaoService = null)
     {
         $this->viacaoService = $ViacaoService ?? new ViacaoService();
+        $this->historicoService = new HistoricoService();
     }
 
     /** Lista marcas e renderiza a tela principal. */
@@ -95,6 +98,14 @@ final class ViacaoController
             $file           // ?array — correto agora
         );
 
+        //historico
+        $this->historicoService->criar(
+            usuarioId: $_SESSION['user_id'],
+            viacaoId: $id,
+            acao: 'criar',
+            dados: ['nome' => $nomeViacao, 'url' => $url, 'cidade' => $cidade]
+        );
+
         View::flash('success', 'Viação criada com sucesso (#' . $id . ').');
         View::redirect('/viacoes');
     }
@@ -169,11 +180,21 @@ final class ViacaoController
             $url,
             $file
         );
+        //historico
+        $this->historicoService->criar(
+            usuarioId: $_SESSION['user_id'],
+            viacaoId: $id,
+            acao: 'editar',
+            dados: ['nome' => $nomeViacao, 'url' => $url, 'cidade' => $cidade]
+        );
 
         View::flash('success', 'viacao atualizada com sucesso.');
+
         View::redirect('/viacoes');
     }
-    /** Remove uma marca via POST para evitar delete por GET. */
+    //historico antes do  delete, pq depois não vai mais ter registro:
+    /* Remove uma marca via POST para evitar delete por GET. */
+
     public function destroy(int $id): void
     {
         $nome = $this->viacaoService->find($id);
@@ -183,6 +204,13 @@ final class ViacaoController
             echo 'Marca não encontrada.';
             return;
         }
+
+        $this->historicoService->criar(
+            usuarioId: $_SESSION['user_id'],
+            viacaoId: $id,
+            acao: 'deletar',
+            dados: ['nome' => $nome->nome]
+        );
 
         $this->viacaoService->delete($id);
 

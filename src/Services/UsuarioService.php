@@ -1,53 +1,40 @@
 <?php
 
-
 namespace App\Services;
 
 use PDO;
 
-class UsuarioService
+final class UsuarioService
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
+    public function __construct(
+        private PDO $pdo
+    ) {
     }
 
-    public function login(string $email, string $senha): bool
-    {
-        $stmt = $this->pdo->prepare("SELECT * FROM usuarios WHERE email = :email");
-        $stmt->execute(['email' => $email]);
-        $user = $stmt->fetch();
+    public function create(
+        string $nome,
+        string $email,
+        string $senha
+    ): void {
+        $hash = password_hash($senha, PASSWORD_DEFAULT);
 
-        // Verifica se usuário existe e se a senha (hash) bate
-        if ($user && password_verify($senha, $user['senha'])) {
-            if (session_status() === PHP_SESSION_NONE) session_start();
+        $stmt = $this->pdo->prepare("
+            INSERT INTO usuarios (
+                nome,
+                email,
+                senha
+            )
+            VALUES (
+                :nome,
+                :email,
+                :senha
+            )
+        ");
 
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_nome'] = $user['nome'];
-            $_SESSION['user_nivel'] = (int)$user['nivel']; // O "pulo do gato" está aqui
-
-            return true;
-        }
-        return false;
+        $stmt->execute([
+            'nome' => $nome,
+            'email' => $email,
+            'senha' => $hash,
+        ]);
     }
-
-    public function downgradeAcesso(): void
-    {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        $_SESSION['user_nivel'] = 0; // Altera apenas a sessão, não o banco
-    }
-
-    public function upgradeAcesso(): void
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        // Forçamos o nível 1 na sessão atual
-        $_SESSION['user_nivel'] = 1;
-        $_SESSION['user_nome'] = 'Admin Temporário';
-    }
-
 }
