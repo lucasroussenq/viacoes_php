@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS usuarios
     status     TINYINT(1)   NOT NULL DEFAULT 1,
     data_criacao TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP    NULL     DEFAULT NULL
-    ON UPDATE CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -54,3 +54,23 @@ CREATE TABLE IF NOT EXISTS historico_viacoes
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
+-- SEED: usuário administrador padrão para desenvolvimento
+--
+-- Email : admin@admin.com
+-- Senha : admin123
+--
+-- O hash abaixo foi gerado com: password_hash('admin123', PASSWORD_BCRYPT)
+-- IMPORTANTE: troque a senha após o primeiro login em produção.
+--
+-- INSERT IGNORE garante que o script pode ser rodado várias vezes
+-- sem duplicar o registro (a constraint UNIQUE no email impediria mesmo,
+-- mas IGNORE evita que vire um erro e interrompa o script).
+-- -----------------------------------------------------------------------------
+INSERT IGNORE INTO usuarios (nome, email, senha)
+VALUES (
+           'Administrador',
+           'admin@admin.com',
+           '$2y$12$xiHsryQXCBdzE1rJQTFWmu01gWRdfw14F7VMbeIGlvBnDlryTiXOa'
+       );

@@ -26,9 +26,9 @@ function getPdo(): PDO
     }
 
     $host = env('DB_HOST', 'db');
-    $db = env('DB_NAME', 'tasks');
-    $user = env('DB_USER', 'app');
-    $pass = env('DB_PASSWORD', 'app123');
+    $db = env('DB_NAME', 'viacoes');
+    $user = env('DB_USER', 'root');
+    $pass = env('DB_PASSWORD', 'root123');
     $charset = 'utf8mb4';
 
     $dsn = "mysql:host={$host};dbname={$db};charset={$charset}";
