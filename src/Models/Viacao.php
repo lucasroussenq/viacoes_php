@@ -14,7 +14,6 @@ final class Viacao
         public string $url,
         public string $cidade,
         public bool $status,
-        public ?string $data_de_alteracao,
         public ?string $data_criacao,
     ) {
     }
@@ -29,12 +28,6 @@ final class Viacao
             url: (string) $row['url'],
             cidade: (string) $row['cidade'],
             status: (int) $row['status'] === 1,
-
-            data_de_alteracao: $row['data_alteracao'] !== null
-                ? (new \DateTime($row['data_alteracao']))
-                    ->setTimezone(new \DateTimeZone('America/Sao_Paulo'))
-                    ->format('d/m/Y H:i:s')
-                : null,
 
             data_criacao: $row['data_criacao'] !== null
                 ? (new \DateTime($row['data_criacao']))

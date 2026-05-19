@@ -6,9 +6,11 @@ use App\Services\AutenticatorService;
 
 final class AutenticadorController
 {
-    public function __construct(
-        private AutenticatorService $autenticatorService
-    ) {
+    private AutenticatorService $autenticatorService;
+
+    public function __construct(?AutenticatorService $autenticatorService = null)
+    {
+        $this->autenticatorService = $autenticatorService ?? new AutenticatorService(\getPdo());
     }
 
     public function login(): void
@@ -40,7 +42,7 @@ final class AutenticadorController
             exit;
         }
 
-        header('Location: /dashboard');
+        header('Location: /viacoes');
         exit;
     }
 

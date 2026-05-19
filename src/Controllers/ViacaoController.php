@@ -5,68 +5,86 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\View;
+use App\Models\Viacao;
 use App\Services\ViacaoService;
 use App\Services\HistoricoService;
 
-/** Controla o fluxo HTTP de marcas e delega persistencia ao ViacaoService. */
+/** Controla o fluxo HTTP de viações e delega persistência ao Service. */
 final class ViacaoController
 {
-    /** Service usado para consultar e alterar marcas. */
-    private ViacaoService $viacaoService;
+    private ViacaoService   $viacaoService;
     private HistoricoService $historicoService;
 
-    /** @param ViacaoService|null $viacoes Permite injecao em testes. */
     public function __construct(?ViacaoService $ViacaoService = null)
     {
-        $this->viacaoService = $ViacaoService ?? new ViacaoService();
+        $this->verificarLogin();
+        $this->viacaoService    = $ViacaoService ?? new ViacaoService();
         $this->historicoService = new HistoricoService();
     }
 
-    /** Lista marcas e renderiza a tela principal. */
+    /** Bloqueia acesso de usuários não autenticados. */
+    private function verificarLogin(): void
+    {
+        if (empty($_SESSION['user_id'])) {
+            View::redirect('/login');
+            exit;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Método auxiliar: monta um snapshot de uma viação.
+    //
+    // Centralizar aqui garante que store(), update() e destroy() sempre
+    // registrem os mesmos campos — se amanhã adicionar um campo novo na tabela,
+    // basta incluí-lo aqui e todos os registros de histórico ficam consistentes.
+    // -------------------------------------------------------------------------
+    /** @return array{nome: string, url: string, cidade: string, status: bool, logo: string|null} */
+    private function snapshot(Viacao $v): array
+    {
+        return [
+            'nome'   => $v->nome,
+            'url'    => $v->url,
+            'cidade' => $v->cidade,
+            'status' => $v->status,   // bool: true = ativo, false = inativo
+            'logo'   => $v->logo,     // string com nome do arquivo ou null
+        ];
+    }
+
+    /** Lista viações e renderiza a tela principal. */
     public function index(): void
     {
         $viacoes = $this->viacaoService->all();
-
         View::render('viacoes/index', [
-            'title' => 'Viações',
+            'title'   => 'Viações',
             'viacoes' => $viacoes,
         ]);
     }
 
-    /** Exibe o histórico de edições de viações. */
+    /** Exibe o histórico de todas as alterações. */
     public function historico(): void
     {
-        $historico = $this->viacaoService->historico();
-
+        $historico = $this->historicoService->listar();
         View::render('viacoes/historico', [
-            'title' => 'Histórico de viações',
+            'title'     => 'Histórico de viações',
             'historico' => $historico,
         ]);
     }
 
-
-
-    /** Exibe o formulario de criacao. */
+    /** Exibe o formulário de criação. */
     public function create(): void
     {
         View::render('viacoes/create', [
-            'title' => 'Criar marca',
+            'title'  => 'Criar viação',
             'errors' => [],
-            'old' => [
-                'nome' => '',
-                'url' => '',
-                'cidade' => '',
-                'logo' => '',
-                'status' => true,
-            ],
+            'old'    => ['nome' => '', 'url' => '', 'cidade' => '', 'logo' => '', 'status' => true],
         ]);
     }
 
-    /** Processa o POST de criacao com PRG (Post Redirect Get). */
+    /** Processa o POST de criação. */
     public function store(): void
     {
-        $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
-        $url        = trim((string) ($_POST['url'] ?? ''));
+        $nomeViacao = trim((string) ($_POST['nome']   ?? ''));
+        $url        = trim((string) ($_POST['url']    ?? ''));
         $cidade     = trim((string) ($_POST['cidade'] ?? ''));
         $status     = (isset($_POST['status']) && $_POST['status'] === '1') ? 1 : 0;
 
@@ -74,89 +92,88 @@ final class ViacaoController
 
         if ($errors !== []) {
             View::render('viacoes/create', [
-                'title'  => 'Criar viacao',
+                'title'  => 'Criar viação',
                 'errors' => $errors,
-                'old'    => [
-                    'nome'   => $nomeViacao,
-                    'url'    => $url,
-                    'cidade' => $cidade,
-                    'logo'   => '',
-                    'status' => $status,
-                ],
+                'old'    => ['nome' => $nomeViacao, 'url' => $url, 'cidade' => $cidade, 'logo' => '', 'status' => $status],
             ]);
             return;
         }
 
-        // Passa $_FILES['logo'] direto — o Service cuida do upload
         $file = (!empty($_FILES['logo']['name'])) ? $_FILES['logo'] : null;
 
-        $id = $this->viacaoService->create(
-            $nomeViacao,
-            $url,
-            $cidade,
-            $status,
-            $file           // ?array — correto agora
-        );
+        // Cria a viação e recebe o ID gerado
+        $id = $this->viacaoService->create($nomeViacao, $url, $cidade, $status, $file);
 
-        //historico
+        // Busca o registro recém-criado para montar o snapshot real
+        // (inclui logo gerada pelo service, status normalizado etc.)
+        $viaCriada = $this->viacaoService->find($id);
+
         $this->historicoService->criar(
-            usuarioId: $_SESSION['user_id'],
-            viacaoId: $id,
-            acao: 'criar',
-            dados: ['nome' => $nomeViacao, 'url' => $url, 'cidade' => $cidade]
+            usuarioId: (int) $_SESSION['user_id'],
+            viacaoId:  $id,
+            acao:      'criar',
+            dados: [
+                // Criação não tem estado anterior — só o estado final (depois)
+                'antes'  => null,
+                'depois' => $viaCriada !== null ? $this->snapshot($viaCriada) : null,
+            ]
         );
 
         View::flash('success', 'Viação criada com sucesso (#' . $id . ').');
         View::redirect('/viacoes');
     }
 
-    /** Exibe o formulario de edicao de uma marca. */
+    /** Exibe o formulário de edição. */
     public function edit(int $id): void
     {
         $viacao = $this->viacaoService->find($id);
 
         if ($viacao === null) {
             http_response_code(404);
-            echo 'Marca não encontrada.';
+            echo 'Viação não encontrada.';
             return;
         }
 
         View::render('viacoes/edit', [
-            'title' => 'Editar viacao',
+            'title'  => 'Editar viação',
             'viacao' => $viacao,
             'errors' => [],
-            'old' => [
-                'nome' => $viacao->nome,
-                'url' => $viacao->url,
+            'old'    => [
+                'nome'   => $viacao->nome,
+                'url'    => $viacao->url,
                 'cidade' => $viacao->cidade,
-                'logo' => $viacao->logo ?? '',
+                'logo'   => $viacao->logo ?? '',
                 'status' => $viacao->status,
             ],
         ]);
     }
 
-    /** Processa o POST de atualizacao. */
+    /** Processa o PUT de atualização. */
     public function update(int $id): void
     {
         $viacaoEditar = $this->viacaoService->find($id);
 
         if ($viacaoEditar === null) {
             http_response_code(404);
-            echo 'viação não encontrada.';
+            echo 'Viação não encontrada.';
             return;
         }
 
-        $nomeViacao = trim((string) ($_POST['nome'] ?? ''));
-        $url        = trim((string) ($_POST['url'] ?? ''));
+        // Captura o snapshot ANTES de qualquer alteração.
+        // É fundamental fazer isso aqui — após o update() os dados já estarão
+        // sobrescritos no banco e não teríamos mais acesso ao estado anterior.
+        $snapshotAntes = $this->snapshot($viacaoEditar);
+
+        $nomeViacao = trim((string) ($_POST['nome']   ?? ''));
+        $url        = trim((string) ($_POST['url']    ?? ''));
         $cidade     = trim((string) ($_POST['cidade'] ?? ''));
-        $file     = trim((string) ($_POST['logo'] ?? ''));
-        $status     = isset($_POST['status']) && (string) $_POST['status'] === '1';
+        $status     = isset($_POST['status']) && $_POST['status'] === '1';
 
         $errors = $this->validateName($nomeViacao);
 
         if ($errors !== []) {
             View::render('viacoes/edit', [
-                'title'  => 'Editar viacao',
+                'title'  => 'Editar viação',
                 'viacao' => $viacaoEditar,
                 'errors' => $errors,
                 'old'    => [
@@ -172,69 +189,69 @@ final class ViacaoController
 
         $file = (!empty($_FILES['logo']['name'])) ? $_FILES['logo'] : null;
 
-        $this->viacaoService->update(
-            $id,
-            $nomeViacao,
-            $cidade,
-            $status,
-            $url,
-            $file
-        );
-        //historico
+        $this->viacaoService->update($id, $nomeViacao, $cidade, $status, $url, $file);
+
+        // Busca o registro atualizado para o snapshot "depois"
+        // (o service pode ter processado a logo — precisamos do nome real gravado)
+        $viacaoAtualizada = $this->viacaoService->find($id);
+
         $this->historicoService->criar(
-            usuarioId: $_SESSION['user_id'],
-            viacaoId: $id,
-            acao: 'editar',
-            dados: ['nome' => $nomeViacao, 'url' => $url, 'cidade' => $cidade]
+            usuarioId: (int) $_SESSION['user_id'],
+            viacaoId:  $id,
+            acao:      'editar',
+            dados: [
+                // Auditoria completa: o avaliador/admin pode ver exatamente o que mudou
+                'antes'  => $snapshotAntes,
+                'depois' => $viacaoAtualizada !== null ? $this->snapshot($viacaoAtualizada) : null,
+            ]
         );
 
-        View::flash('success', 'viacao atualizada com sucesso.');
-
+        View::flash('success', 'Viação atualizada com sucesso.');
         View::redirect('/viacoes');
     }
-    //historico antes do  delete, pq depois não vai mais ter registro:
-    /* Remove uma marca via POST para evitar delete por GET. */
 
+    /** Remove uma viação. */
     public function destroy(int $id): void
     {
-        $nome = $this->viacaoService->find($id);
+        $viacao = $this->viacaoService->find($id);
 
-        if ($nome === null) {
+        if ($viacao === null) {
             http_response_code(404);
-            echo 'Marca não encontrada.';
+            echo 'Viação não encontrada.';
             return;
         }
 
         $this->historicoService->criar(
-            usuarioId: $_SESSION['user_id'],
-            viacaoId: $id,
-            acao: 'deletar',
-            dados: ['nome' => $nome->nome]
+            usuarioId: (int) $_SESSION['user_id'],
+            viacaoId:  $id,
+            acao:      'deletar',
+            dados: [
+                // Deleção registra tudo que existia — não há "depois"
+                'antes'  => $this->snapshot($viacao),
+                'depois' => null,
+            ]
         );
 
+        // Deleta APÓS registrar o histórico — se deletar antes, perdemos os dados
         $this->viacaoService->delete($id);
 
-        View::flash('success', 'viacao removida com sucesso.');
+        View::flash('success', 'Viação removida com sucesso.');
         View::redirect('/viacoes');
     }
 
-    /** @return list<string> Retorna erros de validacao do nome da marca. */
-    private function validateName(string $NomeViacao): array
+    /** @return list<string> */
+    private function validateName(string $nomeViacao): array
     {
         $errors = [];
 
-        if ($NomeViacao === '') {
+        if ($nomeViacao === '') {
             $errors[] = 'O nome da viação é obrigatório.';
         }
 
-        if (strlen($NomeViacao) > 255) {
+        if (strlen($nomeViacao) > 255) {
             $errors[] = 'O nome da viação deve ter no máximo 255 caracteres.';
         }
 
         return $errors;
     }
-
-
-
-
 }
