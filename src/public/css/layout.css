@@ -9,6 +9,7 @@
   --color-accent:        #00a8e1;
   --color-highlight:     #f7a800;
 
+
   --color-text-main:     #000000;
   --color-text-light:    #ffffff;
   --color-text-muted:    #6b7280;
@@ -26,6 +27,8 @@
   --color-bg-surface:    #ffffff;
   --color-bg-alt:        #f9fafb;
 
+  --color-border: #e5e7eb;
+  --color-surface: #f9fafb;
   --border-color:        rgba(0, 0, 0, 0.15);
   --border-focus:        var(--color-highlight);
   --focus-ring:          rgba(0, 168, 225, 0.2);
@@ -91,8 +94,10 @@ h1 {
 }
 
 .page-header {
+  background: var(--color-bg-surface);
   display: flex;
   justify-content: space-between;
+  border-radius: var(--radius-md);
   align-items: center;
   margin-bottom: var(--spacing-lg);
 }
@@ -107,6 +112,73 @@ h1 {
   font-weight: 600;
 }
 
+/* ============================================================
+   HEADER / NAV
+   ============================================================ */
+
+header {
+  width: 100%;
+  background: var(--color-primary);
+  padding: var(--spacing-md) var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.container-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* ============================================================
+   BOTÕES DO HEADER
+   ============================================================ */
+
+.btn-headerlay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.2rem;
+  background: var(--color-bg-alt);
+  --color-text-light: var(--color-primary);
+  color: var(--color-text-light);
+  text-decoration: none;
+  font-size: var(--font-size-base);
+  font-family: var(--font-base), serif;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+
+  transition:
+          background var(--transition),
+          transform var(--transition),
+          border-color var(--transition),
+          box-shadow var(--transition);
+}
+
+/* Hover */
+.btn-headerlay:hover {
+  background: var(--color-highlight);
+  color: var(--color-primary);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+          0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Clique */
+.btn-headerlay:active {
+  transform: scale(0.97);
+}
+
+/* Focus acessível */
+.btn-headerlay:focus {
+  outline: none;
+  border-color: var(--border-focus);
+
+  box-shadow:
+          0 0 0 4px var(--focus-ring);
+}
 
 /* ============================================================
    CARDS
@@ -251,7 +323,7 @@ a {
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-md);
   font-size: var(--font-size-base);
-  font-family: var(--font-base);
+  font-family: var(--font-base), serif;
   cursor: pointer;
   border: 1px solid transparent;
   transition: opacity var(--transition), background var(--transition);
@@ -314,7 +386,7 @@ a {
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  font-family: var(--font-base);
+  font-family: var(--font-base), serif;
   font-size: var(--font-size-base);
   color: var(--color-text-main);
   background: var(--color-bg-surface);
@@ -371,7 +443,7 @@ button[type="submit"] {
   color: var(--color-text-light);
   border: none;
   border-radius: var(--radius-md);
-  font-family: var(--font-base);
+  font-family: var(--font-base), serif;
   font-size: var(--font-size-base);
   font-weight: 600;
   cursor: pointer;
@@ -426,4 +498,87 @@ button[type="submit"]:hover {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   white-space: nowrap;
+}
+.json {
+  margin:0; font-size:0.8rem; white-space:pre-wrap
+}
+
+.mensagem {color:#9ca3af; font-size:0.8rem; grid-column:1/-1; margin:4px 0 0}
+
+.dados {
+  color:#9ca3af
+}
+/*historico
+    Estilos específicos desta página */
+
+.historico-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.historico-table th, .historico-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid
+  var(--color-border);
+  vertical-align: top;
+}
+.historico-table thead th {
+  background: var(--color-surface);
+  font-weight: 600; }
+
+/* Bloco de diff: exibe antes e depois lado a lado */
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-width: 360px;
+}
+
+.diff-col {
+  padding: 8px 10px;
+  border-radius: 6px; }
+
+.diff-col.antes  {
+  background: #fef2f2;
+  border: 1px solid #fecaca; }  /* vermelho claro */
+
+.diff-col.depois {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0; }
+/* verde claro */
+
+.diff-col.unico  {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border, #e5e7eb);
+  grid-column: 1 / -1; }
+
+.diff-col h4 {
+  margin: 0 0 6px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+}
+
+.diff-col table {
+  width: 100%;
+  font-size: 0.85rem;
+  border-collapse: collapse;
+}
+.diff-col table td {
+  padding: 2px 4px;
+}
+
+.diff-col table td:first-child {
+  color: #6b7280;
+  white-space: nowrap;
+  padding-right: 10px;
+}
+
+/* Destaca campos que mudaram */
+.campo-alterado td {
+  font-weight: 600;
+  color: #111;
 }

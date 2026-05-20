@@ -46,28 +46,6 @@ $badgeAcao = static function (string $acao): string {
 
 ?>
 <link rel="stylesheet" href="/css/layout.css">
-<style>
-    /* Estilos específicos desta página */
-    .historico-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    .historico-table th, .historico-table td { padding: 10px 12px; border-bottom: 1px solid var(--color-border, #e5e7eb); vertical-align: top; }
-    .historico-table thead th { background: var(--color-surface, #f9fafb); font-weight: 600; }
-
-    /* Bloco de diff: exibe antes e depois lado a lado */
-    .diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 360px; }
-    .diff-col { padding: 8px 10px; border-radius: 6px; }
-    .diff-col.antes  { background: #fef2f2; border: 1px solid #fecaca; }  /* vermelho claro */
-    .diff-col.depois { background: #f0fdf4; border: 1px solid #bbf7d0; }  /* verde claro */
-    .diff-col.unico  { background: var(--color-surface, #f9fafb); border: 1px solid var(--color-border, #e5e7eb); grid-column: 1 / -1; }
-
-    .diff-col h4 { margin: 0 0 6px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
-    .diff-col table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
-    .diff-col table td { padding: 2px 4px; }
-    .diff-col table td:first-child { color: #6b7280; white-space: nowrap; padding-right: 10px; }
-
-    /* Destaca campos que mudaram */
-    .campo-alterado td { font-weight: 600; color: #111; }
-</style>
-
 <div class="container">
 
     <div class="page-header">
@@ -118,9 +96,9 @@ $badgeAcao = static function (string $acao): string {
                         <td>
                             <?php if ($h->usuario_nome !== null): ?>
                                 <?= htmlspecialchars($h->usuario_nome, ENT_QUOTES, 'UTF-8') ?>
-                                <br><small style="color:#9ca3af">#<?= (int) $h->usuario_id ?></small>
+                                <br><small class="dados">#<?= (int) $h->usuario_id ?></small>
                             <?php else: ?>
-                                <span style="color:#9ca3af">#<?= (int) $h->usuario_id ?></span>
+                                <span class="dados">#<?= (int) $h->usuario_id ?></span>
                             <?php endif; ?>
                         </td>
 
@@ -184,7 +162,7 @@ $badgeAcao = static function (string $acao): string {
                                         </table>
                                     </div>
                                     <?php if (count($camposAlterados) === 0): ?>
-                                        <p style="color:#9ca3af; font-size:0.8rem; grid-column:1/-1; margin:4px 0 0">
+                                        <p class="mensagem">
                                             Nenhum campo alterado (apenas logo ou ação sem mudança de texto).
                                         </p>
                                     <?php endif; ?>
@@ -192,7 +170,7 @@ $badgeAcao = static function (string $acao): string {
                                 <?php else: ?>
                                     <!-- Fallback para registros antigos sem estrutura antes/depois -->
                                     <div class="diff-col unico">
-                                        <pre style="margin:0; font-size:0.8rem; white-space:pre-wrap"><?=
+                                        <pre class="json"><?=
                                             htmlspecialchars(
                                                     json_encode($h->dados, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
                                                     ENT_QUOTES,

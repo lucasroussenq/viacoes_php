@@ -20,14 +20,19 @@ use App\Models\Viacao;
 <body>
 
 <header>
-    <nav class="btn-header">
+    <nav class="header-nav">
         <img alt="logo" src="media/logo_nova_grande.png" class="logo">
-        <p><a href="#">Passagens</a></p>
-        <p><a href="#">Novo!</a></p>
-        <p><a href="#">Hotel</a></p>
-        <button class="btn-login">Login</button>
-        <button class="btn-ajuda">Ajuda</button>
-        <div><img alt="ajuda" src="media/icon_atendimento-online_ajuda.svg"></div>
+        <ul class="nav-links">
+            <li><a href="#">Passagens</a></li>
+            <li><a href="#" class="badge-new">Novo!</a></li>
+            <li><a href="#">Hotel</a></li>
+        </ul>
+        <div class="header-actions">
+             <a href="/login"> <button class="btn-login">Login</button> </a>
+             <a href="/logout"> <button class="btn-login">Logout</button> </a>
+            <button class="btn-ajuda">Ajuda</button>
+            <img alt="ajuda" src="media/icon_atendimento-online_ajuda.svg" class="icon-ajuda">
+        </div>
     </nav>
 </header>
 

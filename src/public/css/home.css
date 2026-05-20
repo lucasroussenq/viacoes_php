@@ -62,9 +62,11 @@
 }
 
 body {
-
+    margin: 0;
+    padding: 0;
     font-size: var(--font-size-defaut);
     color: var(--cor-texto-base);
+    background-color: var(--color-bg-page);
 }
 
 /* Layout */
@@ -79,16 +81,16 @@ body {
 .text-muted    { color: var(--cor-texto-mudo); }
 .text-inverted { color: var(--cor-texto-invertido); }
 
-/* Container centrado com largura máxima */
+
 .container {
     max-width: 100%;
-    margin: 0 auto;  /*verificar*/
+    margin: 0 auto;
     padding: 0 var(--espacamento-gg);
 }
 
 /* Seção genérica com padding vertical */
 .section {
-}  /*verificar!!!*/
+}
 .section--bg-page    { background-color: var(--color-bg-page); }
 .section--bg-white   { background-color: var(--color-bg-white); }
 .section--bg-surface { background-color: var(--color-bg-surface); }
@@ -143,38 +145,28 @@ body {
 }
 /*arrumar isso aqui! ::*/
 /* Botões do header */
-.btn-header {
+.btn-headerlay {
     width: 100%;
     padding: 11px 20px;
-    background-color: var(--color-yellow);
-    color: #e5e5e5;
+    background: var(--color-bg-alt);
+    color: var(--cor-azul-escuro);
     border: none;
     border-radius: var(--radius-p);
     font-size: var(--font-size-m);
 
 }
 
-.btn-login {
-    background-color: var(--color-yellow);
-    color: var(--cor-azul-escuro);
-}
+/* Botões do header — estilos definidos abaixo em .btn-login e .btn-ajuda */
 
-.btn-ajuda {
-    background-color: transparent;
-    color: var(--cor-texto-invertido);
-    border: 2px solid var(--cor-texto-invertido);
-}
-
-/* Logo parceiro (direita do header) */
-.btn-header > div { margin-left: auto; }
-.btn-header > div img { height: 32px; display: block; }
 
 header {
     background-color: var(--color-bg-white);
     padding: var(--espacamento-p) var(--espacamento-g);
     box-shadow: var(--table-sombra);
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 10;
+    width: 100%;
 }
 
 /* CONTAINER NAV */
@@ -182,8 +174,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 /* LOGO */
@@ -309,7 +300,7 @@ header {
 }
 
 .form-group label {
-    color: black;
+    color: var(--cor-texto-invertido);
     font-size: var(--font-size-p);
     font-weight: 600;
     text-transform: uppercase;
@@ -404,8 +395,8 @@ header {
     background-color: var(--color-bg-white);
     border: 1px solid var(---cor-borda-branca);
     border-radius: var(--radius-g);
-    width: 100%;
-    max-width: 100%;
+    width: 15%;
+    max-width: 15%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -810,4 +801,3 @@ details p {
 .assinatura {
     background-color: var(--color-bg-white);
     color: rebeccapurple;}
-

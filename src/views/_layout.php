@@ -15,18 +15,15 @@ $flash = View::pullFlash();
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars($title ?? '', ENT_QUOTES, 'UTF-8') ?></title>
-    <link rel="stylesheet" href="layout.css">
-    <!-- Assuming home.css is also loaded on pages using this layout if needed -->
+    <link rel="stylesheet" href="header.css">
 
 </head>
 <body>
 <header>
     <div >
-        <nav CLASS="container-nav">
-            | <a class="btn-headerlay" href="/viacoes">Viacoes</a>
-            | <a class="btn-headerlay" href="/viacoes/create">Nova viacao</a>
-            | <a class="btn-headerlay" href="/upgrade-acesso">Login admim</a>
-            | <a class="btn-headerlay" href="/downgrade-acesso">login comum</a> |
+        <nav class="container-nav">
+            <a class="btn-headerlay" href="/viacoes">Viacoes</a>
+            <a class="btn-headerlay" href="/viacoes/create">Nova viacao</a>
         </nav>
     </div>
 </header>

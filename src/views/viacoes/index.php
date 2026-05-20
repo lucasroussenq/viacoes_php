@@ -14,6 +14,7 @@ use App\Models\Viacao;
             <nav class="actions">
                 <a class="btn btn-primary" href="/home">Home</a>
                 <a class="btn btn-primary"  href="/viacoes/historico">Histórico</a>
+                <a class="btn btn-primary"  href="/logout">Logout</a>
             </nav>
         </div>
         <a href="/viacoes/create" class="btn btn-primary">
@@ -42,7 +43,7 @@ use App\Models\Viacao;
                     <th>Link</th>
                     <th>Status</th>
                     <th class="date-text">Criada em</th>
-                    <th style="text-align: right;">Ações</th>
+                    <th style="text-align: center;">Ações</th>
                 </tr>
                 </thead>
                 <tbody>

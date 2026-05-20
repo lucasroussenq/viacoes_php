@@ -6,17 +6,8 @@ declare(strict_types=1);
 use App\Controllers\ViacaoController;
 use App\Controllers\HomeController;
 use App\Controllers\AutenticadorController;
-use App\Controllers\SetupController;
 
 /** @var App\Core\Router $router */
-
-// -----------------------------------------------------------------------------
-// Setup — cria o primeiro usuário quando o banco está vazio.
-// A rota se bloqueia automaticamente (403) assim que qualquer usuário existir.
-// Remova ou comente estas linhas após o primeiro deploy em produção.
-// -----------------------------------------------------------------------------
-$router->get('/setup',  [SetupController::class, 'index']);
-$router->post('/setup', [SetupController::class, 'criar']);
 
 // Autenticação
 $router->get('/login',   [AutenticadorController::class, 'login']);
@@ -27,6 +18,7 @@ $router->get('/logout',  [AutenticadorController::class, 'logout']);
 $router->get('/home', [HomeController::class, 'index']);
 
 // CRUD de viações (área protegida — requer login)
+$router->get('/',           [ViacaoController::class, 'index']);
 $router->get('/viacoes',           [ViacaoController::class, 'index']);
 $router->get('/viacoes/create',    [ViacaoController::class, 'create']);
 $router->get('/viacoes/historico', [ViacaoController::class, 'historico']);
