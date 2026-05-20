@@ -4,7 +4,7 @@ namespace App\Services;
 
 use PDO;
 
-final class AutenticatorService
+final class AutenticadorService
 {
     public function __construct(
         private PDO $pdo

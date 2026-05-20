@@ -395,8 +395,8 @@ header {
     background-color: var(--color-bg-white);
     border: 1px solid var(---cor-borda-branca);
     border-radius: var(--radius-g);
-    width: 15%;
-    max-width: 15%;
+    width: 50%;
+    max-width: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -53,13 +53,25 @@ final class ViacaoController
     /** Lista viações e renderiza a tela principal. */
     public function index(): void
     {
-        $busca   = isset($_GET['busca']) ? trim((string) $_GET['busca']) : '';
-        $viacoes = $this->viacaoService->search($busca !== '' ? $busca : null);
+        $nome   = trim((string) ($_GET['nome']   ?? ''));
+        $cidade = trim((string) ($_GET['cidade'] ?? ''));
+        $url    = trim((string) ($_GET['url']    ?? ''));
+        $status = $_GET['status'] ?? '';
+
+        $viacoes = $this->viacaoService->listar(
+            $nome   !== '' ? $nome   : null,
+            $cidade !== '' ? $cidade : null,
+            $url    !== '' ? $url    : null,
+            $status !== '' ? $status : null,
+        );
+
+        $temFiltro = $nome !== '' || $cidade !== '' || $url !== '' || $status !== '';
 
         View::render('viacoes/index', [
-            'title'   => 'Viações',
-            'viacoes' => $viacoes,
-            'busca'   => $busca,
+            'title'     => 'Viações',
+            'viacoes'   => $viacoes,
+            'temFiltro' => $temFiltro,
+            'filtros'   => compact('nome', 'cidade', 'url', 'status'),
         ]);
     }
 
@@ -84,7 +96,6 @@ final class ViacaoController
             'filtroAcao'    => $filtroAcao,
         ]);
     }
-
     /** Exibe o formulário de criação. */
     public function create(): void
     {

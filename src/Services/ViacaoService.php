@@ -20,16 +20,16 @@ final class ViacaoService
 
     public function historico(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM historico_viacoes ");
+        $stmt = $this->pdo->query("SELECT * FROM historico_viacoes");
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** @return list<viacao> Retorna todas as marcas, da mais nova para a mais antiga. */
+    /** @return list<Viacao> Retorna todas as marcas, da mais nova para a mais antiga. */
     public function all(): array
     {
         $stmt = $this->pdo->query('SELECT * FROM viacoes ORDER BY id DESC');
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC); // Corrigido: Adicionado FETCH_ASSOC
 
         $viacoes = [];
         foreach ($rows as $row) {
@@ -40,42 +40,62 @@ final class ViacaoService
     }
 
     /**
-     * Busca viações filtrando por nome, cidade ou url.
-     * Se $termo for vazio ou null, retorna todas (equivalente a all()).
+     * Retorna registros de histórico com filtros opcionais.
      *
+     * @param string|null $usuario  Filtra pelo nome do usuário (LIKE)
+     * @param string|null $viacao   Filtra pelo nome da viação (LIKE, via JOIN)
+     * @param string|null $acao     Filtra pela ação exata (criar, editar, deletar)
+     * @return array
+     */
+    /**
+     * Lista viações com filtros opcionais por nome, cidade, url e status.
      * @return list<Viacao>
      */
-    public function search(?string $termo): array
-    {
-        if ($termo === null || trim($termo) === '') {
-            return $this->all();
+    public function listar(
+        ?string $nome   = null,
+        ?string $cidade = null,
+        ?string $url    = null,
+        ?string $status = null
+    ): array {
+        $where  = [];
+        $params = [];
+
+        if ($nome !== null && $nome !== '') {
+            $where[]        = 'nome LIKE :nome';
+            $params['nome'] = '%' . $nome . '%';
         }
 
-        $like = '%' . trim($termo) . '%';
+        if ($cidade !== null && $cidade !== '') {
+            $where[]          = 'cidade LIKE :cidade';
+            $params['cidade'] = '%' . $cidade . '%';
+        }
 
-        $stmt = $this->pdo->prepare(
-            'SELECT * FROM viacoes
-             WHERE nome   LIKE :t1
-                OR cidade LIKE :t2
-                OR url    LIKE :t3
-             ORDER BY id DESC'
+        if ($url !== null && $url !== '') {
+            $where[]       = 'url LIKE :url';
+            $params['url'] = '%' . $url . '%';
+        }
+
+        if ($status !== null && $status !== '') {
+            $where[]          = 'status = :status';
+            $params['status'] = (int) $status;
+        }
+
+        $whereClause = $where !== [] ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $stmt = $this->pdo->prepare("SELECT * FROM viacoes {$whereClause} ORDER BY id DESC");
+        $stmt->execute($params);
+
+        return array_map(
+            fn(array $row) => Viacao::fromRow($row),
+            $stmt->fetchAll(PDO::FETCH_ASSOC)
         );
-        $stmt->execute(['t1' => $like, 't2' => $like, 't3' => $like]);
-
-        $rows = $stmt->fetchAll();
-
-        $viacoes = [];
-        foreach ($rows as $row) {
-            $viacoes[] = Viacao::fromRow($row);
-        }
-
-        return $viacoes;
     }
 
+    /** @return list<Viacao> */
     public function ativas(): array
     {
-        $stmt = $this->pdo->query('SELECT * FROM viacoes WHERE status = 1 ORDER BY id DESC ');
-        $rows = $stmt->fetchAll();
+        $stmt = $this->pdo->query('SELECT * FROM viacoes WHERE status = 1 ORDER BY id DESC');
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC); // Corrigido: Adicionado FETCH_ASSOC
 
         $viacoes = [];
         foreach ($rows as $row) {
@@ -85,13 +105,13 @@ final class ViacaoService
         return $viacoes;
     }
 
-    /** @return viacao|null Retorna null quando o id nao existe. */
-    public function find(int $id): ?viacao
+    /** @return Viacao|null Retorna null quando o id nao existe. */
+    public function find(int $id): ?Viacao
     {
         $stmt = $this->pdo->prepare('SELECT * FROM viacoes WHERE id = :id');
         $stmt->execute(['id' => $id]);
 
-        $row = $stmt->fetch();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!is_array($row)) {
             return null;
         }
@@ -107,7 +127,6 @@ final class ViacaoService
         int $status,
         ?array $file = null
     ): int {
-
         $logo = null;
 
         if ($file && isset($file['name']) && $file['name'] !== '') {
@@ -132,10 +151,7 @@ final class ViacaoService
         return (int)$this->pdo->lastInsertId();
     }
 
-    /** Atualiza os campos de uma marca existente.
-     * @param string|null $logo
-     * @param string|null $url
-     */
+    /** Atualiza os campos de uma marca existente. */
     public function update(
         int $id,
         string $nome,
@@ -144,11 +160,10 @@ final class ViacaoService
         ?string $url,
         ?array $file = null
     ): void {
-
         $stmt = $this->pdo->prepare('SELECT logo FROM viacoes WHERE id = :id');
         $stmt->execute(['id' => $id]);
-        $registro  = $stmt->fetch();
-        $logoAtual = $registro['logo'];
+        $registro  = $stmt->fetch(PDO::FETCH_ASSOC); // Corrigido: Adicionado FETCH_ASSOC
+        $logoAtual = $registro ? $registro['logo'] : null;
 
         $logo = $logoAtual;
         if ($file && isset($file['name']) && $file['name'] !== '') {
@@ -178,8 +193,6 @@ final class ViacaoService
 
     /**
      * Método privado para tratar o upload de arquivos.
-     * Centralizado para garantir que as regras de segurança (MIME type, tamanho)
-     * sejam as mesmas em todo o app.
      */
     private function validateFile(array $file): string
     {
@@ -217,7 +230,6 @@ final class ViacaoService
             throw new \RuntimeException('Tipo de arquivo inválido.');
         }
 
-        // ✅ SVG é XML/texto — getimagesize() não funciona, validação separada
         if ($mime === 'image/svg+xml') {
             $this->validateSvg($file['tmp_name']);
         } else {
@@ -244,7 +256,6 @@ final class ViacaoService
 
     /**
      * Valida SVG: confirma XML bem-formado e bloqueia scripts embutidos.
-     * SVG é um vetor de XSS — nunca confie só na extensão ou MIME.
      */
     private function validateSvg(string $tmpPath): void
     {
@@ -265,7 +276,7 @@ final class ViacaoService
         $padroesBloqueados = [
             '/<script/i',
             '/javascript:/i',
-            '/on\w+\s*=/i',   // onclick=, onload=, onerror= etc.
+            '/on\w+\s*=/i',
             '/<foreignObject/i',
         ];
 

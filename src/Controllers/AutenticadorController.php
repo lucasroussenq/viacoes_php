@@ -2,15 +2,15 @@
 
 namespace App\Controllers;
 
-use App\Services\AutenticatorService;
+use App\Services\AutenticadorService;
 
 final class AutenticadorController
 {
-    private AutenticatorService $autenticatorService;
+    private AutenticadorService $autenticatorService;
 
-    public function __construct(?AutenticatorService $autenticatorService = null)
+    public function __construct(?AutenticadorService $autenticatorService = null)
     {
-        $this->autenticatorService = $autenticatorService ?? new AutenticatorService(\getPdo());
+        $this->autenticatorService = $autenticatorService ?? new AutenticadorService(\getPdo());
     }
 
     public function login(): void

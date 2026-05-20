@@ -30,25 +30,45 @@ $busca = $busca ?? '';
     </header>
 
     <!-- Barra de busca -->
-    <form method="get" action="/viacoes" class="search-bar">
-        <div class="search-group">
-            <input
-                    type="search"
-                    name="busca"
-                    class="search-input"
-                    placeholder="Buscar por nome, cidade ou URL…"
-                    value="<?= htmlspecialchars($busca, ENT_QUOTES, 'UTF-8') ?>"
-                    autocomplete="off"
-            >
-            <button type="submit" class="btn btn-primary">Buscar</button>
-            <?php if ($busca !== ''): ?>
+    <?php
+    $filtros   = $filtros   ?? [];
+    $temFiltro = $temFiltro ?? false;
+    ?>
+
+    <form method="get" action="/viacoes" class="search-bar search-bar--multi">
+        <div class="search-group search-group--multi">
+
+            <input type="search" name="nome"
+                   class="search-input"
+                   placeholder="Nome da viação…"
+                   value="<?= htmlspecialchars($filtros['nome'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+
+            <input type="search" name="cidade"
+                   class="search-input"
+                   placeholder="Cidade…"
+                   value="<?= htmlspecialchars($filtros['cidade'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+
+            <input type="search" name="url"
+                   class="search-input"
+                   placeholder="URL…"
+                   value="<?= htmlspecialchars($filtros['url'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+
+            <select name="status" class="search-select">
+                <option value="">Todos os status</option>
+                <option value="1" <?= ($filtros['status'] ?? '') === '1' ? 'selected' : '' ?>>Ativo</option>
+                <option value="0" <?= ($filtros['status'] ?? '') === '0' ? 'selected' : '' ?>>Inativo</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+
+            <?php if ($temFiltro): ?>
                 <a href="/viacoes" class="btn btn-ghost">Limpar</a>
             <?php endif; ?>
         </div>
-        <?php if ($busca !== ''): ?>
+
+        <?php if ($temFiltro): ?>
             <p class="search-info">
-                <?= count($viacoes) ?> resultado(s) para
-                "<strong><?= htmlspecialchars($busca, ENT_QUOTES, 'UTF-8') ?></strong>"
+                <?= count($viacoes) ?> resultado(s) encontrado(s)
             </p>
         <?php endif; ?>
     </form>
