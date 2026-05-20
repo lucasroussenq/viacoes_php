@@ -45,22 +45,36 @@ final class HistoricoService
     }
 
     /**
-     * Retorna TODOS os registros de histórico, do mais recente para o mais antigo.
+     * Retorna registros de histórico com filtros opcionais.
      *
-     * Histórico de auditoria é um registro global do sistema — não filtra por
-     * usuário logado. Qualquer usuário autenticado pode ver todas as ações
-     * (quem criou, editou ou deletou cada viação).
-     *
-     * Se futuramente precisar restringir por perfil (ex: só admin vê tudo),
-     * basta adicionar um parâmetro $apenasDoUsuario = false aqui.
-     *
+     * @param string|null $usuario  Filtra pelo nome do usuário (LIKE)
+     * @param string|null $viacao   Filtra pelo nome da viação (LIKE, via JOIN)
+     * @param string|null $acao     Filtra pela ação exata (criar, editar, deletar)
      * @return list<Historico>
      */
-    public function listar(): array
+    public function listar(?string $usuario = null, ?string $viacao = null, ?string $acao = null): array
     {
-        // JOIN com usuarios para trazer o nome de quem fez a ação,
-        // sem depender de foreign key — o relacionamento é feito pelo campo indexado usuario_id
-        $stmt = $this->pdo->query("
+        $where  = [];
+        $params = [];
+
+        if ($usuario !== null && trim($usuario) !== '') {
+            $where[]           = 'u.nome LIKE :usuario';
+            $params['usuario'] = '%' . trim($usuario) . '%';
+        }
+
+        if ($viacao !== null && trim($viacao) !== '') {
+            $where[]          = 'v.nome LIKE :viacao';
+            $params['viacao'] = '%' . trim($viacao) . '%';
+        }
+
+        if ($acao !== null && trim($acao) !== '') {
+            $where[]        = 'h.acao = :acao';
+            $params['acao'] = trim($acao);
+        }
+
+        $whereClause = $where !== [] ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $sql = "
             SELECT
                 h.id,
                 h.usuario_id,
@@ -68,11 +82,17 @@ final class HistoricoService
                 h.acao,
                 h.dados,
                 h.data_criacao,
-                u.nome AS usuario_nome
+                u.nome AS usuario_nome,
+                v.nome AS viacao_nome
             FROM historico_viacoes h
             LEFT JOIN usuarios u ON u.id = h.usuario_id
+            LEFT JOIN viacoes  v ON v.id = h.viacao_id
+            {$whereClause}
             ORDER BY h.id DESC
-        ");
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
 
         $rows = $stmt->fetchAll();
 

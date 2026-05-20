@@ -53,20 +53,35 @@ final class ViacaoController
     /** Lista viações e renderiza a tela principal. */
     public function index(): void
     {
-        $viacoes = $this->viacaoService->all();
+        $busca   = isset($_GET['busca']) ? trim((string) $_GET['busca']) : '';
+        $viacoes = $this->viacaoService->search($busca !== '' ? $busca : null);
+
         View::render('viacoes/index', [
             'title'   => 'Viações',
             'viacoes' => $viacoes,
+            'busca'   => $busca,
         ]);
     }
 
     /** Exibe o histórico de todas as alterações. */
     public function historico(): void
     {
-        $historico = $this->historicoService->listar();
+        $filtroUsuario = isset($_GET['usuario']) ? trim((string) $_GET['usuario']) : '';
+        $filtroViacao  = isset($_GET['viacao'])  ? trim((string) $_GET['viacao'])  : '';
+        $filtroAcao    = isset($_GET['acao'])     ? trim((string) $_GET['acao'])    : '';
+
+        $historico = $this->historicoService->listar(
+            $filtroUsuario !== '' ? $filtroUsuario : null,
+            $filtroViacao  !== '' ? $filtroViacao  : null,
+            $filtroAcao    !== '' ? $filtroAcao    : null,
+        );
+
         View::render('viacoes/historico', [
-            'title'     => 'Histórico de viações',
-            'historico' => $historico,
+            'title'         => 'Histórico de viações',
+            'historico'     => $historico,
+            'filtroUsuario' => $filtroUsuario,
+            'filtroViacao'  => $filtroViacao,
+            'filtroAcao'    => $filtroAcao,
         ]);
     }
 

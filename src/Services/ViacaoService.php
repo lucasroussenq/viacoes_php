@@ -39,6 +39,39 @@ final class ViacaoService
         return $viacoes;
     }
 
+    /**
+     * Busca viações filtrando por nome, cidade ou url.
+     * Se $termo for vazio ou null, retorna todas (equivalente a all()).
+     *
+     * @return list<Viacao>
+     */
+    public function search(?string $termo): array
+    {
+        if ($termo === null || trim($termo) === '') {
+            return $this->all();
+        }
+
+        $like = '%' . trim($termo) . '%';
+
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM viacoes
+             WHERE nome   LIKE :t1
+                OR cidade LIKE :t2
+                OR url    LIKE :t3
+             ORDER BY id DESC'
+        );
+        $stmt->execute(['t1' => $like, 't2' => $like, 't3' => $like]);
+
+        $rows = $stmt->fetchAll();
+
+        $viacoes = [];
+        foreach ($rows as $row) {
+            $viacoes[] = Viacao::fromRow($row);
+        }
+
+        return $viacoes;
+    }
+
     public function ativas(): array
     {
         $stmt = $this->pdo->query('SELECT * FROM viacoes WHERE status = 1 ORDER BY id DESC ');
@@ -95,9 +128,9 @@ final class ViacaoService
             'status' => $status ? 1 : 0,
             'logo'   => $logo
         ]);
-                return (int)$this->pdo->lastInsertId();
-            }
 
+        return (int)$this->pdo->lastInsertId();
+    }
 
     /** Atualiza os campos de uma marca existente.
      * @param string|null $logo
@@ -112,18 +145,16 @@ final class ViacaoService
         ?array $file = null
     ): void {
 
-        // 1. SELECT separado para buscar logo atual
         $stmt = $this->pdo->prepare('SELECT logo FROM viacoes WHERE id = :id');
         $stmt->execute(['id' => $id]);
-        $registro = $stmt->fetch();
-        $logoAtual = $registro['logo']; // guarda a logo atual
+        $registro  = $stmt->fetch();
+        $logoAtual = $registro['logo'];
 
         $logo = $logoAtual;
         if ($file && isset($file['name']) && $file['name'] !== '') {
-            $logo = $this->validateFile($file); // ✅ reutiliza o método que já existe
+            $logo = $this->validateFile($file);
         }
 
-        // 3. UPDATE separado
         $stmt = $this->pdo->prepare(
             'UPDATE viacoes SET nome = :nome, url = :url, cidade = :cidade, logo = :logo, status = :status WHERE id = :id'
         );
@@ -147,7 +178,7 @@ final class ViacaoService
 
     /**
      * Método privado para tratar o upload de arquivos.
-     * Como sênior, recomendo centralizar isso para garantir que as regras de segurança (MIME type, tamanho)
+     * Centralizado para garantir que as regras de segurança (MIME type, tamanho)
      * sejam as mesmas em todo o app.
      */
     private function validateFile(array $file): string
@@ -162,7 +193,6 @@ final class ViacaoService
             throw new \RuntimeException('Arquivo muito grande.');
         }
 
-        // Extensões permitidas
         $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
 
         $extension = strtolower(
@@ -173,45 +203,76 @@ final class ViacaoService
             throw new \RuntimeException('Extensão não permitida.');
         }
 
-        // Valida MIME type REAL do arquivo
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-
-        $mime = $finfo->file($file['tmp_name']);
+        $mime  = $finfo->file($file['tmp_name']);
 
         $mimesPermitidos = [
             'image/jpeg',
             'image/png',
             'image/webp',
-            'image/svg+xml'
+            'image/svg+xml',
         ];
 
-        // Nunca confiar na extensão do arquivo vinda do usuário. Valide o conteúdo REAL (MIME).
         if (!in_array($mime, $mimesPermitidos, true)) {
             throw new \RuntimeException('Tipo de arquivo inválido.');
         }
 
-        if (getimagesize($file['tmp_name']) === false) {
-            throw new \RuntimeException('Arquivo não é uma imagem válida.');
+        // ✅ SVG é XML/texto — getimagesize() não funciona, validação separada
+        if ($mime === 'image/svg+xml') {
+            $this->validateSvg($file['tmp_name']);
+        } else {
+            if (getimagesize($file['tmp_name']) === false) {
+                throw new \RuntimeException('Arquivo não é uma imagem válida.');
+            }
         }
 
-        // Gera um nome aleatório (UUID/Hash) para evitar que usuários sobrescrevam arquivos uns dos outros
         $nomeNovo = bin2hex(random_bytes(16)) . '.' . $extension;
+        $pasta    = __DIR__ . '/../public/uploads/';
 
-        // Pasta de upload
-        $pasta = __DIR__ . '/../public/uploads/';
-
-        // Cria pasta com permissão mais segura
         if (!is_dir($pasta)) {
             mkdir($pasta, 0755, true);
         }
 
         $destino = $pasta . $nomeNovo;
 
-        // Move arquivo
         if (!move_uploaded_file($file['tmp_name'], $destino)) {
             throw new \RuntimeException('Falha ao mover o arquivo.');
         }
 
         return $nomeNovo;
+    }
+
+    /**
+     * Valida SVG: confirma XML bem-formado e bloqueia scripts embutidos.
+     * SVG é um vetor de XSS — nunca confie só na extensão ou MIME.
+     */
+    private function validateSvg(string $tmpPath): void
+    {
+        $content = file_get_contents($tmpPath);
+
+        if ($content === false) {
+            throw new \RuntimeException('Não foi possível ler o arquivo SVG.');
+        }
+
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($content);
+        libxml_clear_errors();
+
+        if ($xml === false) {
+            throw new \RuntimeException('SVG inválido ou malformado.');
+        }
+
+        $padroesBloqueados = [
+            '/<script/i',
+            '/javascript:/i',
+            '/on\w+\s*=/i',   // onclick=, onload=, onerror= etc.
+            '/<foreignObject/i',
+        ];
+
+        foreach ($padroesBloqueados as $padrao) {
+            if (preg_match($padrao, $content)) {
+                throw new \RuntimeException('SVG contém conteúdo não permitido.');
+            }
+        }
     }
 }

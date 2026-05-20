@@ -582,3 +582,587 @@ button[type="submit"]:hover {
   font-weight: 600;
   color: #111;
 }
+
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ============================================================
+   BASE
+   ============================================================ */
+body {
+  font-family: var(--font-base), sans-serif;
+  background: var(--color-bg-page);
+  color: var(--color-text-main);
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+h1 {
+  margin-bottom: var(--spacing-md);
+}
+
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.page-header {
+  background: var(--color-bg-surface);
+  display: flex;
+  justify-content: space-between;
+  border-radius: var(--radius-md);
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.modoADM {
+  display: inline-flex;
+  background: var(--color-highlight);
+  color: var(--color-primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/* ============================================================
+   HEADER / NAV
+   ============================================================ */
+
+header {
+  width: 100%;
+  background: var(--color-primary);
+  padding: var(--spacing-md) var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.container-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* ============================================================
+   BOTÕES DO HEADER
+   ============================================================ */
+
+.btn-headerlay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.2rem;
+  background: var(--color-bg-alt);
+  --color-text-light: var(--color-primary);
+  color: var(--color-text-light);
+  text-decoration: none;
+  font-size: var(--font-size-base);
+  font-family: var(--font-base), serif;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+
+  transition:
+          background var(--transition),
+          transform var(--transition),
+          border-color var(--transition),
+          box-shadow var(--transition);
+}
+
+/* Hover */
+.btn-headerlay:hover {
+  background: var(--color-highlight);
+  color: var(--color-primary);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+          0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Clique */
+.btn-headerlay:active {
+  transform: scale(0.97);
+}
+
+/* Focus acessível */
+.btn-headerlay:focus {
+  outline: none;
+  border-color: var(--border-focus);
+
+  box-shadow:
+          0 0 0 4px var(--focus-ring);
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card,
+.table-card,
+.form-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-card {
+  padding: var(--spacing-lg);
+  max-width: 520px;
+}
+
+
+/* ============================================================
+   ALERTAS
+   Suporte a ambas as convenções: alert--danger (BEM) e alert-danger
+   ============================================================ */
+.alert {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid transparent;
+}
+
+.alert--success,
+.alert-success {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border-color: var(--color-success-soft);
+}
+
+.alert--danger,
+.alert-danger {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-soft);
+}
+
+.alert--warning,
+.alert-warning {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+  border-color: #fde68a;
+}
+
+.alert ul {
+  margin-top: var(--spacing-xs);
+  padding-left: var(--spacing-lg);
+}
+
+.alert li {
+  margin-bottom: 2px;
+}
+
+
+/* ============================================================
+   TABELA
+   ============================================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-base);
+}
+
+th,
+td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+
+th {
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+tbody tr:hover {
+  background: var(--color-bg-alt);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.badge-active {
+  color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+.badge-inactive {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+
+/* ============================================================
+   LINKS
+   ============================================================ */
+a {
+  text-decoration: none;
+}
+
+.url-link {
+  color: var(--color-highlight);
+  font-size: var(--font-size-link);
+}
+
+.url-link:hover {
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-family: var(--font-base), serif;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity var(--transition), background var(--transition);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-text-light);
+}
+
+.btn-primary:hover {
+  opacity: 0.88;
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--color-text-main);
+}
+
+.btn-ghost:hover {
+  background: var(--color-bg-alt);
+}
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.btn-danger:hover {
+  background: var(--color-danger-bg);
+}
+
+
+/* ============================================================
+   FORMULÁRIOS
+   ============================================================ */
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group input[type="email"],
+.form-group input[type="file"],
+.form-group select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-base), serif;
+  font-size: var(--font-size-base);
+  color: var(--color-text-main);
+  background: var(--color-bg-surface);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--border-focus);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.form-help-text {
+  margin-top: 4px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.radio-group {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: 4px;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-base);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-text-main);
+  cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+  width: auto;
+  cursor: pointer;
+}
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+button[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-lg);
+  background: var(--color-primary);
+  color: var(--color-text-light);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-base), serif;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition);
+  margin-top: var(--spacing-sm);
+}
+
+button[type="submit"]:hover {
+  opacity: 0.88;
+}
+
+
+/* ============================================================
+   LOGO PREVIEW
+   ============================================================ */
+.logo-preview {
+  margin-bottom: var(--spacing-xs);
+}
+
+.logo-preview img {
+  display: block;
+  max-width: 160px;
+  max-height: 60px;
+  object-fit: contain;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  background: var(--color-bg-alt);
+}
+
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.actions form {
+  display: inline;
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl) var(--spacing-md);
+  color: var(--color-text-muted);
+}
+
+.date-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.json {
+  margin:0; font-size:0.8rem; white-space:pre-wrap
+}
+
+.mensagem {color:#9ca3af; font-size:0.8rem; grid-column:1/-1; margin:4px 0 0}
+
+.dados {
+  color:#9ca3af
+}
+/*historico
+    Estilos específicos desta página */
+
+.historico-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.historico-table th, .historico-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid
+  var(--color-border);
+  vertical-align: top;
+}
+.historico-table thead th {
+  background: var(--color-surface);
+  font-weight: 600; }
+
+/* Bloco de diff: exibe antes e depois lado a lado */
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-width: 360px;
+}
+
+.diff-col {
+  padding: 8px 10px;
+  border-radius: 6px; }
+
+.diff-col.antes  {
+  background: #fef2f2;
+  border: 1px solid #fecaca; }  /* vermelho claro */
+
+.diff-col.depois {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0; }
+/* verde claro */
+
+.diff-col.unico  {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border, #e5e7eb);
+  grid-column: 1 / -1; }
+
+.diff-col h4 {
+  margin: 0 0 6px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+}
+
+.diff-col table {
+  width: 100%;
+  font-size: 0.85rem;
+  border-collapse: collapse;
+}
+.diff-col table td {
+  padding: 2px 4px;
+}
+
+.diff-col table td:first-child {
+  color: #6b7280;
+  white-space: nowrap;
+  padding-right: 10px;
+}
+
+/* Destaca campos que mudaram */
+.campo-alterado td {
+  font-weight: 600;
+  color: #111;
+}
+
+/* ── Barra de busca / filtros ─────────────────────────────────────────────── */
+.search-bar {
+  margin-bottom: 1.25rem;
+}
+
+.search-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.search-group--multi {
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 180px;
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #111827;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.search-select {
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #111827;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.search-info {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}

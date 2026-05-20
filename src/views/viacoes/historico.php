@@ -7,7 +7,14 @@ use App\Models\Historico;
 /**
  * @var list<Historico> $historico
  * @var string $title
+ * @var string $filtroUsuario
+ * @var string $filtroViacao
+ * @var string $filtroAcao
  */
+
+$filtroUsuario = $filtroUsuario ?? '';
+$filtroViacao  = $filtroViacao  ?? '';
+$filtroAcao    = $filtroAcao    ?? '';
 
 // Mapa de rótulos para exibição amigável dos campos
 $rotulos = [
@@ -44,6 +51,8 @@ $badgeAcao = static function (string $acao): string {
     return '<span class="' . $class . '">' . htmlspecialchars($acao, ENT_QUOTES, 'UTF-8') . '</span>';
 };
 
+$temFiltro = $filtroUsuario !== '' || $filtroViacao !== '' || $filtroAcao !== '';
+
 ?>
 <link rel="stylesheet" href="/css/layout.css">
 <div class="container">
@@ -53,9 +62,57 @@ $badgeAcao = static function (string $acao): string {
         <a href="/viacoes" class="btn btn-ghost">← Voltar</a>
     </div>
 
+    <!-- Filtros -->
+    <form method="get" action="/viacoes/historico" class="search-bar search-bar--multi">
+        <div class="search-group search-group--multi">
+            <input
+                    type="search"
+                    name="usuario"
+                    class="search-input"
+                    placeholder="Nome do usuário…"
+                    value="<?= htmlspecialchars($filtroUsuario, ENT_QUOTES, 'UTF-8') ?>"
+                    autocomplete="off"
+            >
+            <input
+                    type="search"
+                    name="viacao"
+                    class="search-input"
+                    placeholder="Nome da viação…"
+                    value="<?= htmlspecialchars($filtroViacao, ENT_QUOTES, 'UTF-8') ?>"
+                    autocomplete="off"
+            >
+            <select name="acao" class="search-select">
+                <option value="">Todas as ações</option>
+                <option value="criar"   <?= $filtroAcao === 'criar'   ? 'selected' : '' ?>>Criar</option>
+                <option value="editar"  <?= $filtroAcao === 'editar'  ? 'selected' : '' ?>>Editar</option>
+                <option value="deletar" <?= $filtroAcao === 'deletar' ? 'selected' : '' ?>>Deletar</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <?php if ($temFiltro): ?>
+                <a href="/viacoes/historico" class="btn btn-ghost">Limpar</a>
+            <?php endif; ?>
+        </div>
+        <?php if ($temFiltro): ?>
+            <p class="search-info">
+                <?= count($historico) ?> registro(s) encontrado(s)
+                <?php
+                $partes = [];
+                if ($filtroUsuario !== '') $partes[] = 'usuário "<strong>' . htmlspecialchars($filtroUsuario, ENT_QUOTES, 'UTF-8') . '</strong>"';
+                if ($filtroViacao  !== '') $partes[] = 'viação "<strong>'  . htmlspecialchars($filtroViacao,  ENT_QUOTES, 'UTF-8') . '</strong>"';
+                if ($filtroAcao    !== '') $partes[] = 'ação "<strong>'    . htmlspecialchars($filtroAcao,    ENT_QUOTES, 'UTF-8') . '</strong>"';
+                echo 'para ' . implode(', ', $partes);
+                ?>
+            </p>
+        <?php endif; ?>
+    </form>
+
     <?php if (count($historico) === 0): ?>
         <div class="card empty-state">
-            <p>Nenhuma ação registrada ainda.</p>
+            <?php if ($temFiltro): ?>
+                <p>Nenhum registro encontrado para os filtros aplicados.</p>
+            <?php else: ?>
+                <p>Nenhuma ação registrada ainda.</p>
+            <?php endif; ?>
         </div>
     <?php else: ?>
 

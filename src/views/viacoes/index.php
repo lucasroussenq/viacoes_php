@@ -3,7 +3,9 @@ declare(strict_types=1);
 use App\Models\Viacao;
 
 /** @var list<Viacao> $viacoes */
+/** @var string $busca */
 
+$busca = $busca ?? '';
 ?>
 <link rel="stylesheet" href="/css/layout.css">
 
@@ -27,9 +29,37 @@ use App\Models\Viacao;
         <?php endif; ?>
     </header>
 
+    <!-- Barra de busca -->
+    <form method="get" action="/viacoes" class="search-bar">
+        <div class="search-group">
+            <input
+                    type="search"
+                    name="busca"
+                    class="search-input"
+                    placeholder="Buscar por nome, cidade ou URL…"
+                    value="<?= htmlspecialchars($busca, ENT_QUOTES, 'UTF-8') ?>"
+                    autocomplete="off"
+            >
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <?php if ($busca !== ''): ?>
+                <a href="/viacoes" class="btn btn-ghost">Limpar</a>
+            <?php endif; ?>
+        </div>
+        <?php if ($busca !== ''): ?>
+            <p class="search-info">
+                <?= count($viacoes) ?> resultado(s) para
+                "<strong><?= htmlspecialchars($busca, ENT_QUOTES, 'UTF-8') ?></strong>"
+            </p>
+        <?php endif; ?>
+    </form>
+
     <?php if (count($viacoes) === 0): ?>
         <div class="card empty-state">
-            <p>Nenhuma viação cadastrada no sistema.</p>
+            <?php if ($busca !== ''): ?>
+                <p>Nenhuma viação encontrada para a busca "<strong><?= htmlspecialchars($busca, ENT_QUOTES, 'UTF-8') ?></strong>".</p>
+            <?php else: ?>
+                <p>Nenhuma viação cadastrada no sistema.</p>
+            <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="table-card">
