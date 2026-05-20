@@ -12,7 +12,7 @@ $busca = $busca ?? '';
 <main class="container">
     <header class="page-header">
         <div>
-            <h1>Viação / Marcas</h1>
+            <h1 style="color: white">Viação / Marcas</h1>
             <nav class="actions">
                 <a class="btn btn-primary" href="/home">Home</a>
                 <a class="btn btn-primary"  href="/viacoes/historico">Histórico</a>
