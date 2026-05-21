@@ -1,5 +1,6 @@
 <?php
-
+//Representa um usuário do sistema com id, nome, email e senha (hash).
+// O fromRow() formata a data para o fuso de São Paulo.
 declare(strict_types=1);
 
 namespace App\Models;

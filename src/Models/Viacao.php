@@ -1,7 +1,8 @@
 <?php
 
 declare(strict_types=1);
-
+// O metodo estático fromRow() converte o array bruto do PDO nesse objeto,
+// fazendo as conversões de tipo necessárias (inteiro, bool, formatação de data).
 namespace App\Models;
 
 //Representa uma marca de viação carregada do banco. */

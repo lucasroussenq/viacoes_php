@@ -1,5 +1,6 @@
 <?php
-
+//Representa um registro de auditoria.
+//O campo dados chega do banco como string JSON e o fromRow() já o decodifica para array PHP com as chaves antes e depois.
 declare(strict_types=1);
 
 namespace App\Models;

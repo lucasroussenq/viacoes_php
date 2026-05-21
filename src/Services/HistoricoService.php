@@ -1,5 +1,6 @@
 <?php
-
+//Grava e recupera o histórico de quem fez o quê e quando nas viações.
+// Os dados são salvos como JSON no banco, incluindo o estado "antes" e "depois" de cada alteração.
 declare(strict_types=1);
 
 namespace App\Services;
@@ -56,7 +57,7 @@ final class HistoricoService
     {
         $where  = [];
         $params = [];
-
+//where pesquisa por aproximação exata, com registros exatamente iguais
         if ($usuario !== null && trim($usuario) !== '') {
             $where[]           = 'u.nome LIKE :usuario';
             $params['usuario'] = '%' . trim($usuario) . '%';

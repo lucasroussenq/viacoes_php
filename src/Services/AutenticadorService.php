@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Services;
-
+//Valida o login comparando a senha digitada com o hash bcrypt armazenado no banco.
+// Se válido, grava o user_id na sessão. O logout() simplesmente destrói a sessão.
 use PDO;
 
 final class AutenticadorService

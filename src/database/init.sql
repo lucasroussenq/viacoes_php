@@ -75,6 +75,7 @@ VALUES (
            '$2y$12$9JM0Smbuv4SeH01PQFIU/OFZfacYmQYQFdvLqvmcQR/hLOW4cgLWu'
        );
 
+-- se necessário criar outro hash use: echo password_hash('sua_senha',PASSWORD_BCRYPT);
 -- VIAÇÕES
 INSERT IGNORE INTO viacoes (nome, url, cidade, logo, status)
 VALUES

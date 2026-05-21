@@ -1,5 +1,7 @@
 <?php
-
+//O controller mais completo do projeto.
+// Gerencia o ciclo de vida das viações: listar, criar, editar, deletar.
+// Também registra histórico de auditoria em cada operação e bloqueia acesso de usuários não logados.
 declare(strict_types=1);
 
 namespace App\Controllers;
@@ -30,11 +32,9 @@ final class ViacaoController
             exit;
         }
     }
-    //
     // Centralizar aqui garante que store(), update() e destroy() sempre
-    // registrem os mesmos campos — se amanhã adicionar um campo novo na tabela,
+    // registrem os mesmos campos, se amanhã adicionar um campo novo na tabela,
     // basta incluí-lo aqui e todos os registros de histórico ficam consistentes.
-    // -------------------------------------------------------------------------
     /** @return array{nome: string, url: string, cidade: string, status: bool, logo: string|null} */
     private function snapshot(Viacao $v): array
     {

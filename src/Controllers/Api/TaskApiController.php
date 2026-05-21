@@ -1,5 +1,6 @@
 <?php
-
+//Em vez de chamar View::render(), este controller responde em JSON puro.
+// É a "versão API" do TaskController — mesma lógica, formato diferente.
 declare(strict_types=1);
 
 namespace App\Controllers\Api;

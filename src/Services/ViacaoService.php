@@ -1,5 +1,6 @@
 <?php
-
+//Toda query SQL relacionada a viações vive aqui. Recebe dados simples (strings, ints), faz as operações no banco e retorna objetos Viacao.
+// O Controller nunca toca no PDO diretamente.
 declare(strict_types=1);
 
 namespace App\Services;
@@ -59,12 +60,12 @@ final class ViacaoService
     ): array {
         $where  = [];
         $params = [];
-
+// like pesquisa por aproximação, usa %(qualquer coisa antes e depois) e  pode encontrar partes de uma string
         if ($nome !== null && $nome !== '') {
             $where[]        = 'nome LIKE :nome';
             $params['nome'] = '%' . $nome . '%';
         }
-
+//where pesquisa por aproximação exata, com registros exatamente iguais
         if ($cidade !== null && $cidade !== '') {
             $where[]          = 'cidade LIKE :cidade';
             $params['cidade'] = '%' . $cidade . '%';

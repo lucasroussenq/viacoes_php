@@ -1,5 +1,6 @@
 <?php
-
+//Controla o acesso ao sistema.
+// Exibe o formulário de login, valida as credenciais via AutenticatorService e gerencia a sessão.
 namespace App\Controllers;
 
 use App\Services\AutenticadorService;

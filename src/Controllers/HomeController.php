@@ -1,5 +1,6 @@
 <?php
-
+//Renderiza a página inicial pública com as viações ativas.
+// Tem tratamento de erro  — se o banco falhar, a página continua funcionando (sem viações em vez de quebrar).
 declare(strict_types=1);
 
 namespace App\Controllers;
