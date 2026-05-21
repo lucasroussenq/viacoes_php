@@ -30,9 +30,6 @@ final class ViacaoController
             exit;
         }
     }
-
-    // -------------------------------------------------------------------------
-    // Método auxiliar: monta um snapshot de uma viação.
     //
     // Centralizar aqui garante que store(), update() e destroy() sempre
     // registrem os mesmos campos — se amanhã adicionar um campo novo na tabela,

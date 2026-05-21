@@ -20,7 +20,7 @@ final class AutenticadorController
 
     public function autenticar(): void
     {
-        $email = trim($_POST['email'] ?? '');
+        $email = $_POST['email'] ?? '';
         $senha = $_POST['senha'] ?? '';
 
         if ($email === '' || $senha === '') {

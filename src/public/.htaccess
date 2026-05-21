@@ -1,11 +1,12 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
+#fala pro apache redirecionar toda url que não seja um arqui real.
 
-# Se existir arquivo/pasta, serve direto
+# Se existir arquivo/pasta(css,imagem) , serve direto
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Caso contrário, manda para o front controller
+# se nao, manda para o front controller ->index.php
 RewriteRule ^ index.php [L]
 </IfModule>

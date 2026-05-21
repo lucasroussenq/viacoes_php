@@ -1,10 +1,4 @@
--- CRIAÇÃO DO BANCO
-
-CREATE DATABASE IF NOT EXISTS viacoes
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE viacoes;
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- TABELA DE USUÁRIOS
 
@@ -55,22 +49,60 @@ CREATE TABLE IF NOT EXISTS historico_viacoes
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- -----------------------------------------------------------------------------
--- SEED: usuário administrador padrão para desenvolvimento
---
+
 -- Email : admin@admin.com
--- Senha : admin123
---
--- O hash abaixo foi gerado com: password_hash('admin123', PASSWORD_BCRYPT)
--- IMPORTANTE: troque a senha após o primeiro login em produção.
---
--- INSERT IGNORE garante que o script pode ser rodado várias vezes
--- sem duplicar o registro (a constraint UNIQUE no email impediria mesmo,
--- mas IGNORE evita que vire um erro e interrompa o script).
--- -----------------------------------------------------------------------------
+-- Senha : password
 INSERT IGNORE INTO usuarios (nome, email, senha)
 VALUES (
-           'Administrador',
+           'Adm',
            'admin@admin.com',
-           '$2y$12$xiHsryQXCBdzE1rJQTFWmu01gWRdfw14F7VMbeIGlvBnDlryTiXOa'
+           '$2y$12$9JM0Smbuv4SeH01PQFIU/OFZfacYmQYQFdvLqvmcQR/hLOW4cgLWu'
        );
+-- Email : pablo@gmail.com
+-- Senha : password
+INSERT IGNORE INTO usuarios (nome, email, senha)
+VALUES (
+           'Pablo',
+           'pablo@admin.com',
+           '$2y$12$9JM0Smbuv4SeH01PQFIU/OFZfacYmQYQFdvLqvmcQR/hLOW4cgLWu'
+       );
+-- Email : austin@gmail.com
+-- Senha : password
+INSERT IGNORE INTO usuarios (nome, email, senha)
+VALUES (
+           'Austin',
+           'austin@admin.com',
+           '$2y$12$9JM0Smbuv4SeH01PQFIU/OFZfacYmQYQFdvLqvmcQR/hLOW4cgLWu'
+       );
+
+-- VIAÇÕES
+INSERT IGNORE INTO viacoes (nome, url, cidade, logo, status)
+VALUES
+    (
+        'Reunidas Paulista',
+        'https://queropassagem.com.br/reunidaspaulista.com.br',
+        'São Paulo - SP',
+        '8f67fcf90ead4c5d18c5075bb326f266.svg',
+        1
+    ),
+    (
+        'Catarinense',
+        'https://queropassagem.com.br/catarinense.net',
+        'Florianópolis - SC',
+        '7637d11fc910395427cb557880247246.svg',
+        1
+    ),
+    (
+        '1001',
+        'https://queropassagem.com.br/auto-viacao-1001',
+        'Curitiba - PR',
+        '53b0ded0529b845827081171a6b3e0a8.svg',
+        1
+    ),
+    (
+        'Cometa',
+        'https://queropassagem.com.br/viacaocometa.com.br',
+        'São Paulo - SP',
+        'cb6a32d0830b4494359d747fe2469331.svg',
+        1
+    );
