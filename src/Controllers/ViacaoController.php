@@ -216,6 +216,7 @@ final class ViacaoController
 
         // Busca o registro atualizado para o snapshot "depois"
         // (o service pode ter processado a logo — precisamos do nome real gravado)
+
         $viacaoAtualizada = $this->viacaoService->find($id);
 
         $this->historicoService->criar(
@@ -223,7 +224,7 @@ final class ViacaoController
             viacaoId:  $id,
             acao:      'editar',
             dados: [
-                // Auditoria completa: o avaliador/admin pode ver exatamente o que mudou
+                // Auditoria completa: o admin pode ver exatamente o que mudou
                 'antes'  => $snapshotAntes,
                 'depois' => $viacaoAtualizada !== null ? $this->snapshot($viacaoAtualizada) : null,
             ]

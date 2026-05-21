@@ -17,15 +17,13 @@ final class HistoricoService
         $this->pdo = $pdo ?? \getPdo();
     }
 
-    /**
-     * Insere um registro de auditoria.
-     *
-     * O array $dados deve seguir a estrutura:
-     *   ['antes' => snapshot|null, 'depois' => snapshot|null]
-     *
-     * Onde snapshot é:
-     *   ['nome' => string, 'url' => string, 'cidade' => string, 'status' => bool, 'logo' => string|null]
-     */
+    //Insere um registro de auditoria.
+
+   /* O array $dados deve seguir a estrutura:
+       ['antes' => snapshot|null, 'depois' => snapshot|null]
+     Onde snapshot é:
+       ['nome' => string, 'url' => string, 'cidade' => string, 'status' => bool, 'logo' => string|null] */
+
     public function criar(
         int    $usuarioId,
         int    $viacaoId,

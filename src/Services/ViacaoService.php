@@ -65,7 +65,6 @@ final class ViacaoService
             $where[]        = 'nome LIKE :nome';
             $params['nome'] = '%' . $nome . '%';
         }
-//where pesquisa por aproximação exata, com registros exatamente iguais
         if ($cidade !== null && $cidade !== '') {
             $where[]          = 'cidade LIKE :cidade';
             $params['cidade'] = '%' . $cidade . '%';
@@ -192,22 +191,22 @@ final class ViacaoService
         $stmt->execute(['id' => $id]);
     }
 
-    /**
-     * Método privado para tratar o upload de arquivos.
-     */
+
+    // Metodo privado para tratar o uploads de imagem:
+
     private function validateFile(array $file): string
     {
         if ($file['error'] !== UPLOAD_ERR_OK) {
             throw new \RuntimeException('Erro no upload do arquivo.');
         }
 
-        $maxSize = 2 * 1024 * 1024;
+        $maxSize = 2 * 1024 * 1024; //verifica o tamanho
 
         if ($file['size'] > $maxSize) {
             throw new \RuntimeException('Arquivo muito grande.');
         }
 
-        $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
+        $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp', 'svg']; // verifica extensões
 
         $extension = strtolower(
             pathinfo($file['name'], PATHINFO_EXTENSION)
@@ -219,7 +218,7 @@ final class ViacaoService
 
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mime  = $finfo->file($file['tmp_name']);
-
+//valida o tipo com mime type
         $mimesPermitidos = [
             'image/jpeg',
             'image/png',
@@ -230,7 +229,7 @@ final class ViacaoService
         if (!in_array($mime, $mimesPermitidos, true)) {
             throw new \RuntimeException('Tipo de arquivo inválido.');
         }
-
+//tratamento do svg, que antes não aceitava
         if ($mime === 'image/svg+xml') {
             $this->validateSvg($file['tmp_name']);
         } else {
@@ -255,9 +254,8 @@ final class ViacaoService
         return $nomeNovo;
     }
 
-    /**
-     * Valida SVG: confirma XML bem-formado e bloqueia scripts embutidos.
-     */
+     //Valida SVG: confirma XML bem-formado e bloqueia scripts embutidos.
+
     private function validateSvg(string $tmpPath): void
     {
         $content = file_get_contents($tmpPath);
@@ -265,7 +263,7 @@ final class ViacaoService
         if ($content === false) {
             throw new \RuntimeException('Não foi possível ler o arquivo SVG.');
         }
-
+//leitura de xml de forma segura
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($content);
         libxml_clear_errors();
