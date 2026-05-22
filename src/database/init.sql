@@ -107,3 +107,9 @@ VALUES
         'cb6a32d0830b4494359d747fe2469331.svg',
         1
     );
+
+ALTER TABLE usuarios ADD COLUMN deletado_em TIMESTAMP NULL DEFAULT NULL;
+
+ALTER TABLE viacoes ADD COLUMN deletado_em TIMESTAMP NULL DEFAULT NULL;
+
+ALTER TABLE historico_viacoes ADD COLUMN nome_tabela VARCHAR(50) NOT NULL DEFAULT 'viacoes' AFTER dados;
