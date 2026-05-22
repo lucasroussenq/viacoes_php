@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS usuarios
     nome       VARCHAR(100) NOT NULL,
     email      VARCHAR(120) NOT NULL UNIQUE,
     senha      VARCHAR(255) NOT NULL,
-    status     TINYINT(1)   NOT NULL DEFAULT 1,
+    status     ENUM ('ativo', 'inativo', 'deletado') NOT NULL DEFAULT 'ativo',
     data_criacao TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP    NULL     DEFAULT NULL
         ON UPDATE CURRENT_TIMESTAMP
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS viacoes
     url        VARCHAR(255) NOT NULL DEFAULT '',
     cidade     VARCHAR(100) NOT NULL DEFAULT '',
     logo       VARCHAR(255)          DEFAULT NULL,
-    status     TINYINT(1)   NOT NULL DEFAULT 1,
+    status     ENUM ('ativo', 'inativo', 'deletado') NOT NULL DEFAULT 'ativo',
     data_criacao TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP    NULL     DEFAULT NULL
         ON UPDATE CURRENT_TIMESTAMP
@@ -60,7 +60,7 @@ VALUES (
        );
 -- Email : pablo@gmail.com
 -- Senha : password
-INSERT IGNORE INTO usuarios (nome, email, senha)
+INSERT IGNORE INTusuariosO usuarios (nome, email, senha)
 VALUES (
            'Pablo',
            'pablo@admin.com',
@@ -108,8 +108,3 @@ VALUES
         1
     );
 
-ALTER TABLE usuarios ADD COLUMN deletado_em TIMESTAMP NULL DEFAULT NULL;
-
-ALTER TABLE viacoes ADD COLUMN deletado_em TIMESTAMP NULL DEFAULT NULL;
-
-ALTER TABLE historico_viacoes ADD COLUMN nome_tabela VARCHAR(50) NOT NULL DEFAULT 'viacoes' AFTER dados;
