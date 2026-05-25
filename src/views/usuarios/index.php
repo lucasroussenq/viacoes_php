@@ -6,7 +6,11 @@ use App\Models\Usuario;
 /** @var string $busca */
 
 $busca = $busca ?? '';
+
 ?>
+<title>Usuários</title>
+
+<div>
 <link rel="stylesheet" href="/css/layout.css">
 
 <main class="container">
@@ -16,6 +20,7 @@ $busca = $busca ?? '';
             <nav class="actions">
                 <a class="btn btn-primary" href="/home">Home</a>
                 <a class="btn btn-primary"  href="/historico/historico">Histórico</a>
+                <a class="btn btn-primary" href="/viacoes/">Viações</a>
                 <a class="btn btn-primary"  href="/logout">Logout</a>
             </nav>
         </div>

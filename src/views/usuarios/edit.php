@@ -12,6 +12,7 @@ $action = "/usuarios/{$usuario->id}";
 $method = "PUT";
 $old    = $old ?? [];
 ?>
+    <title>Editar Usuário</title>
 
     <h1>Editar usuário #<?= (int) $usuario->id ?></h1>
 

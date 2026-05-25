@@ -10,6 +10,7 @@ $method  = null;
 $usuario = null;
 $old     = $old ?? [];
 ?>
+    <title>Criar Usuário</title>
 
     <h1>Criar usuário</h1>
 
