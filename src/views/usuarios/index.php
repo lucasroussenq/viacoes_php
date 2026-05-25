@@ -106,7 +106,7 @@ $busca = $busca ?? '';
                         </td>
                         <td>
                             <div class="actions" style="justify-content: flex-end;">
-                                <a href="/viacoes/<?= (int) $usuario['id'] ?>/edit" class="btn btn-ghost">
+                                <a href="/usuarios/<?= (int) $usuario['id'] ?>/edit" class="btn btn-ghost">
                                     Editar
                                 </a>
 
