@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS usuarios
     nome       VARCHAR(100) NOT NULL,
     email      VARCHAR(120) NOT NULL UNIQUE,
     senha      VARCHAR(255) NOT NULL,
-    status     ENUM ('ativo', 'inativo', 'deletado') NOT NULL DEFAULT 'ativo',
+    status     TINYINT(1)   NOT NULL DEFAULT 1,
     data_criacao TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP    NULL     DEFAULT NULL
         ON UPDATE CURRENT_TIMESTAMP
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS viacoes
     url        VARCHAR(255) NOT NULL DEFAULT '',
     cidade     VARCHAR(100) NOT NULL DEFAULT '',
     logo       VARCHAR(255)          DEFAULT NULL,
-    status     ENUM ('ativo', 'inativo', 'deletado') NOT NULL DEFAULT 'ativo',
+    status     TINYINT(1)   NOT NULL DEFAULT 1,
     data_criacao TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP    NULL     DEFAULT NULL
         ON UPDATE CURRENT_TIMESTAMP
@@ -60,7 +60,7 @@ VALUES (
        );
 -- Email : pablo@gmail.com
 -- Senha : password
-INSERT IGNORE INTusuariosO usuarios (nome, email, senha)
+INSERT IGNORE INTO usuarios (nome, email, senha)
 VALUES (
            'Pablo',
            'pablo@admin.com',
@@ -107,4 +107,37 @@ VALUES
         'cb6a32d0830b4494359d747fe2469331.svg',
         1
     );
+
+CREATE TABLE IF NOT EXISTS historico_alteracoes (
+                                      id SERIAL PRIMARY KEY,
+                                      entidade_id INT NOT NULL,            -- ID do Usuário ou da Viação
+                                      entidade_tipo VARCHAR(50) NOT NULL,  -- 'Usuario' ou 'Viacao'
+                                      campo_alterado VARCHAR(100) NOT NULL,
+                                      valor_antigo TEXT,
+                                      valor_novo TEXT,
+                                      alterado_por INT,                    -- ID do usuário que fez a alteração
+                                      data_alteracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE viacoes MODIFY COLUMN status VARCHAR(20);
+
+UPDATE viacoes
+SET viacoes.status = CASE
+                      WHEN viacoes.status = '0' THEN 'inativo'
+                      WHEN viacoes.status = '1' THEN 'ativo'
+
+    END;
+
+ALTER TABLE viacoes MODIFY COLUMN status ENUM('inativo', 'ativo', 'deletado');
+
+ALTER TABLE usuarios MODIFY COLUMN status VARCHAR(20);
+
+UPDATE usuarios
+SET usuarios.status = CASE
+                         WHEN usuarios.status = '0' THEN 'inativo'
+                         WHEN usuarios.status = '1' THEN 'ativo'
+
+    END;
+
+ALTER TABLE usuarios MODIFY COLUMN status ENUM('inativo', 'ativo', 'deletado');
 
