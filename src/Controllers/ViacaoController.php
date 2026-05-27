@@ -1,7 +1,5 @@
 <?php
-//O controller mais completo do projeto.
-// Gerencia o ciclo de vida das viações: listar, criar, editar, deletar.
-// Também registra histórico de auditoria em cada operação e bloqueia acesso de usuários não logados.
+
 declare(strict_types=1);
 
 namespace App\Controllers;
@@ -19,6 +17,9 @@ final class ViacaoController
 
     public function __construct(?ViacaoService $ViacaoService = null)
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $this->verificarLogin();
         $this->viacaoService    = $ViacaoService ?? new ViacaoService();
         $this->historicoService = new HistoricoService();
@@ -27,23 +28,36 @@ final class ViacaoController
     /** Bloqueia acesso de usuários não autenticados. */
     private function verificarLogin(): void
     {
-        if (empty($_SESSION['user_id'])) {
+        // Se seu sistema usa 'usuario_id' ou 'user_id', certifique-se de validar o correto.
+        // Mantido 'user_id' conforme o seu código original.
+        if (empty($_SESSION['user_id']) && empty($_SESSION['usuario_id'])) {
             View::redirect('/login');
             exit;
         }
     }
-    // Centralizar aqui garante que store(), update() e destroy() sempre
-    // registrem os mesmos campos, se amanhã adicionar um campo novo na tabela,
-    // basta incluí-lo aqui e todos os registros de histórico ficam consistentes.
-    /** @return array{nome: string, url: string, cidade: string, status: bool, logo: string|null} */
+
+    /** Recupera o ID do Administrador logado na sessão */
+    private function getAdminId(): int
+    {
+        return (int)($_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? 1);
+    }
+
+    /** * CORREÇÃO DA SESSÃO DE SNAPSHOT: Retorna o status tratado puramente como string ('ativo' ou 'inativo')
+     * @return array{nome: string, url: string, cidade: string, status: string, logo: string|null}
+     */
     private function snapshot(Viacao $v): array
     {
+        $statusString = 'inativo';
+        if ($v->status === true || $v->status === '1' || $v->status === 1 || $v->status === 'ativo') {
+            $statusString = 'ativo';
+        }
+
         return [
             'nome'   => $v->nome,
             'url'    => $v->url,
             'cidade' => $v->cidade,
-            'status' => $v->status,   // bool: true = ativo, false = inativo
-            'logo'   => $v->logo,     // string com nome do arquivo ou null
+            'status' => $statusString,
+            'logo'   => $v->logo,
         ];
     }
 
@@ -79,11 +93,11 @@ final class ViacaoController
         $filtroViacao  = isset($_GET['viacao'])  ? trim((string) $_GET['viacao'])  : '';
         $filtroAcao    = isset($_GET['acao'])     ? trim((string) $_GET['acao'])    : '';
 
-        $historico = $this->historicoService->listar(
-            $filtroUsuario !== '' ? $filtroUsuario : null,
-            $filtroViacao  !== '' ? $filtroViacao  : null,
-            $filtroAcao    !== '' ? $filtroAcao    : null,
-        );
+        $historico = $this->historicoService->getHistory([
+            'tab'     => 'viacoes',
+            'usuario' => $filtroUsuario,
+            'alvo'    => $filtroViacao
+        ]);
 
         View::render('viacoes/historico', [
             'title'         => 'Histórico de viações',
@@ -93,13 +107,14 @@ final class ViacaoController
             'filtroAcao'    => $filtroAcao,
         ]);
     }
+
     /** Exibe o formulário de criação. */
     public function create(): void
     {
         View::render('viacoes/create', [
             'title'  => 'Criar viação',
             'errors' => [],
-            'old'    => ['nome' => '', 'url' => '', 'cidade' => '', 'logo' => '', 'status' => true],
+            'old'    => ['nome' => '', 'url' => '', 'cidade' => '', 'logo' => '', 'status' => 'ativo'],
         ]);
     }
 
@@ -109,7 +124,8 @@ final class ViacaoController
         $nomeViacao = trim((string) ($_POST['nome']   ?? ''));
         $url        = trim((string) ($_POST['url']    ?? ''));
         $cidade     = trim((string) ($_POST['cidade'] ?? ''));
-        $status     = (isset($_POST['status']) && $_POST['status'] === '1') ? 1 : 0;
+
+        $status = (isset($_POST['status']) && ($_POST['status'] === '1' || $_POST['status'] === 'ativo')) ? 'ativo' : 'inativo';
 
         $errors = $this->validateName($nomeViacao);
 
@@ -124,22 +140,19 @@ final class ViacaoController
 
         $file = (!empty($_FILES['logo']['name'])) ? $_FILES['logo'] : null;
 
-        // Cria a viação e recebe o ID gerado
         $id = $this->viacaoService->create($nomeViacao, $url, $cidade, $status, $file);
-
-        // Busca o registro recém-criado para montar o snapshot real
-        // (inclui logo gerada pelo service, status normalizado etc.)
         $viaCriada = $this->viacaoService->find($id);
 
+        // CORREÇÃO DOS PARÂMETROS NOMEADOS: Mapeado estritamente com os nomes da assinatura do HistoricoService
         $this->historicoService->criar(
-            usuarioId: (int) $_SESSION['user_id'],
-            viacaoId:  $id,
-            acao:      'criar',
+            usuarioId:    $this->getAdminId(),
+            entidadeId:   $id,
+            acao:         'CREATE',
             dados: [
-                // Criação não tem estado anterior — só o estado final (depois)
                 'antes'  => null,
                 'depois' => $viaCriada !== null ? $this->snapshot($viaCriada) : null,
-            ]
+            ],
+            entidadeTipo: 'viacoes'
         );
 
         View::flash('success', 'Viação criada com sucesso (#' . $id . ').');
@@ -182,15 +195,19 @@ final class ViacaoController
             return;
         }
 
-        // Captura o snapshot ANTES de qualquer alteração.
-        // É fundamental fazer isso aqui — após o update() os dados já estarão
-        // sobrescritos no banco e não teríamos mais acesso ao estado anterior.
-        $snapshotAntes = $this->snapshot($viacaoEditar);
+        $snapshotAntes = [
+            'nome'   => $viacaoEditar->nome,
+            'url'    => $viacaoEditar->url,
+            'cidade' => $viacaoEditar->cidade,
+            'status' => ($viacaoEditar->status === true || $viacaoEditar->status === '1' || $viacaoEditar->status === 1 || $viacaoEditar->status === 'ativo') ? 'ativo' : 'inativo',
+            'logo'   => $viacaoEditar->logo,
+        ];
 
         $nomeViacao = trim((string) ($_POST['nome']   ?? ''));
         $url        = trim((string) ($_POST['url']    ?? ''));
         $cidade     = trim((string) ($_POST['cidade'] ?? ''));
-        $status     = isset($_POST['status']) && $_POST['status'] === '1';
+
+        $status = (isset($_POST['status']) && ($_POST['status'] === '1' || $_POST['status'] === 'ativo')) ? 'ativo' : 'inativo';
 
         $errors = $this->validateName($nomeViacao);
 
@@ -214,23 +231,20 @@ final class ViacaoController
 
         $this->viacaoService->update($id, $nomeViacao, $cidade, $status, $url, $file);
 
-        // Busca o registro atualizado para o snapshot "depois"
-        // (o service pode ter processado a logo — precisamos do nome real gravado)
-
         $viacaoAtualizada = $this->viacaoService->find($id);
 
         $this->historicoService->criar(
-            usuarioId: (int) $_SESSION['user_id'],
-            viacaoId:  $id,
-            acao:      'editar',
+            usuarioId:    $this->getAdminId(),
+            entidadeId:   $id,
+            acao:         'UPDATE',
             dados: [
-                // Auditoria completa: o admin pode ver exatamente o que mudou
                 'antes'  => $snapshotAntes,
                 'depois' => $viacaoAtualizada !== null ? $this->snapshot($viacaoAtualizada) : null,
-            ]
+            ],
+            entidadeTipo: 'viacoes'
         );
 
-        View::flash('success', 'Viação atualizada com sucesso.');
+        View::flash('success', 'Viação actualizada com sucesso.');
         View::redirect('/viacoes');
     }
 
@@ -246,20 +260,19 @@ final class ViacaoController
         }
 
         $this->historicoService->criar(
-            usuarioId: (int) $_SESSION['user_id'],
-            viacaoId:  $id,
-            acao:      'deletar',
+            usuarioId:    $this->getAdminId(),
+            entidadeId:   $id,
+            acao:         'DELETE',
             dados: [
-                // Deleção registra tudo que existia — não há "depois"
                 'antes'  => $this->snapshot($viacao),
                 'depois' => null,
-            ]
+            ],
+            entidadeTipo: 'viacoes'
         );
 
-        // Deleta APÓS registrar o histórico — se deletar antes, perdemos os dados
         $this->viacaoService->delete($id);
 
-        View::flash('success', 'Viação removida com sucesso.');
+        View::flash('success', 'Viação removed com sucesso.');
         View::redirect('/viacoes');
     }
 
@@ -267,15 +280,12 @@ final class ViacaoController
     private function validateName(string $nomeViacao): array
     {
         $errors = [];
-
         if ($nomeViacao === '') {
             $errors[] = 'O nome da viação é obrigatório.';
         }
-
         if (strlen($nomeViacao) > 255) {
             $errors[] = 'O nome da viação deve ter no máximo 255 caracteres.';
         }
-
         return $errors;
     }
 }
