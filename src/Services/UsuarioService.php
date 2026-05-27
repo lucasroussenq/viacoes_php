@@ -8,10 +8,22 @@ use PDO;
 final class UsuarioService
 {
     private PDO $pdo;
+    private HistoricoService $historicoService;
 
-    public function __construct(?PDO $pdo = null)
+    public function __construct(?PDO $pdo = null, ?HistoricoService $historicoService = null)
     {
         $this->pdo = $pdo ?? \getPdo();
+        // Injeta o HistoricoService para gerenciar os logs no padrão do sistema
+        $this->historicoService = $historicoService ?? new HistoricoService($this->pdo);
+    }
+
+    /** obter ID do administrador logado na sessão */
+    private function getAdminId(): int
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        return (int)($_SESSION['usuario_id'] ?? 1);
     }
 
     /** criar usuário */
@@ -30,12 +42,32 @@ final class UsuarioService
             'status' => $status
         ]);
 
-        return (int)$this->pdo->lastInsertId();
+        $novoId = (int)$this->pdo->lastInsertId();
+
+        // Snapshot dos dados iniciais
+        $dadosDepois = [
+            'nome'   => $nome,
+            'email'  => $email,
+            'status' => $status
+        ];
+
+        // Grava no histórico geral como escopo de 'usuarios'
+        $this->historicoService->criar(
+            $this->getAdminId(),
+            $novoId,
+            'CREATE',
+            ['depois' => $dadosDepois],
+            'usuarios'
+        );
+
+        return $novoId;
     }
 
     /** listar todos os Usuários (Esconde os deletados e aceita filtros) */
+    /** listar todos os Usuários (Esconde os deletados e aceita filtros) */
     public function all(array $filtros = []): array
     {
+        // Reincluída a coluna 'senha' no SELECT para a Model Usuario::fromRow não quebrar
         $sql = "SELECT id, nome, email, senha, status, data_criacao FROM viacoes.usuarios WHERE status != 'deletado'";
         $params = [];
 
@@ -58,12 +90,16 @@ final class UsuarioService
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(
+            fn(array $row) => \App\Models\Usuario::fromRow($row),
+            $stmt->fetchAll(PDO::FETCH_ASSOC)
+        );
     }
 
     /** buscar um único Usuário pelo ID */
     public function find(int $id): ?\App\Models\Usuario
     {
+        // Reincluída a coluna 'senha' no SELECT aqui também
         $stmt = $this->pdo->prepare("SELECT id, nome, email, senha, status, data_criacao FROM viacoes.usuarios WHERE id = :id AND status != 'deletado'");
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -71,17 +107,22 @@ final class UsuarioService
         return $row ? \App\Models\Usuario::fromRow($row) : null;
     }
 
-    /** ATUALIZAR USUÁRIO (Adicionado para resolver o erro) */
+    /** ATUALIZAR USUÁRIO */
     public function update(int $id, string $nome, string $email, string $status, ?string $novaSenha = null): bool
     {
+        // 1. Captura o estado atual do usuário antes de rodar o update para o Log Diff
+        $stmtOld = $this->pdo->prepare("SELECT nome, email, status FROM viacoes.usuarios WHERE id = :id");
+        $stmtOld->execute(['id' => $id]);
+        $usuarioAntigo = $stmtOld->fetch(PDO::FETCH_ASSOC);
+
         // Se uma nova senha foi preenchida, atualiza ela com hash. Senão, mantém a atual.
-        if ($novaSenha !== null) {
+        if ($novaSenha !== null && trim($novaSenha) !== '') {
             $senhaHash = password_hash($novaSenha, PASSWORD_BCRYPT);
             $stmt = $this->pdo->prepare("
-            UPDATE viacoes.usuarios 
-            SET nome = :nome, email = :email, status = :status, senha = :senha 
-            WHERE id = :id
-        ");
+                UPDATE viacoes.usuarios 
+                SET nome = :nome, email = :email, status = :status, senha = :senha 
+                WHERE id = :id
+            ");
             $params = [
                 'id' => $id,
                 'nome' => $nome,
@@ -91,10 +132,10 @@ final class UsuarioService
             ];
         } else {
             $stmt = $this->pdo->prepare("
-            UPDATE viacoes.usuarios 
-            SET nome = :nome, email = :email, status = :status 
-            WHERE id = :id
-        ");
+                UPDATE viacoes.usuarios 
+                SET nome = :nome, email = :email, status = :status 
+                WHERE id = :id
+            ");
             $params = [
                 'id' => $id,
                 'nome' => $nome,
@@ -103,14 +144,60 @@ final class UsuarioService
             ];
         }
 
-        return $stmt->execute($params);
+        $sucesso = $stmt->execute($params);
+
+        // 2. Se salvou no banco, grava a alteração mapeando o antes e o depois
+        if ($sucesso && $usuarioAntigo) {
+            $dadosAntes = [
+                'nome'   => $usuarioAntigo['nome'],
+                'email'  => $usuarioAntigo['email'],
+                'status' => $usuarioAntigo['status']
+            ];
+
+            $dadosDepois = [
+                'nome'   => $nome,
+                'email'  => $email,
+                'status' => $status
+            ];
+
+            $this->historicoService->criar(
+                $this->getAdminId(),
+                $id,
+                'UPDATE',
+                ['antes' => $dadosAntes, 'depois' => $dadosDepois],
+                'usuarios'
+            );
+        }
+
+        return $sucesso;
     }
 
     /** soft delete nos registros */
     public function delete(int $id): void
     {
+        // Captura dados antes de remover
+        $stmtOld = $this->pdo->prepare("SELECT nome, email, status FROM viacoes.usuarios WHERE id = :id");
+        $stmtOld->execute(['id' => $id]);
+        $usuarioAntigo = $stmtOld->fetch(PDO::FETCH_ASSOC);
+
         $stmt = $this->pdo->prepare("UPDATE viacoes.usuarios SET status = 'deletado' WHERE id = :id");
-        $stmt->execute(['id' => $id]);
+        $stmt = $stmt->execute(['id' => $id]);
+
+        if ($usuarioAntigo) {
+            $dadosAntes = [
+                'nome'   => $usuarioAntigo['nome'],
+                'email'  => $usuarioAntigo['email'],
+                'status' => $usuarioAntigo['status']
+            ];
+
+            $this->historicoService->criar(
+                $this->getAdminId(),
+                $id,
+                'DELETE',
+                ['antes' => $dadosAntes],
+                'usuarios'
+            );
+        }
     }
 
     /** poder restaurar registros marcados como deletados */
@@ -118,38 +205,26 @@ final class UsuarioService
     {
         $stmt = $this->pdo->prepare("UPDATE viacoes.usuarios SET status = 'ativo' WHERE id = :id");
         $stmt->execute(['id' => $id]);
-    }
 
-    private function gravarLog(int $entidadeId, string $acao, array $antes = null, array $depois = null): void
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+        // Captura o estado pós-restauração
+        $stmtNew = $this->pdo->prepare("SELECT nome, email, status FROM viacoes.usuarios WHERE id = :id");
+        $stmtNew->execute(['id' => $id]);
+        $usuarioNovo = $stmtNew->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuarioNovo) {
+            $dadosDepois = [
+                'nome'   => $usuarioNovo['nome'],
+                'email'  => $usuarioNovo['email'],
+                'status' => $usuarioNovo['status']
+            ];
+
+            $this->historicoService->criar(
+                $this->getAdminId(),
+                $id,
+                'RESTORE',
+                ['depois' => $dadosDepois],
+                'usuarios'
+            );
         }
-
-        // Resgata o ID do administrador logado na sessão
-        $alteradoPor = $_SESSION['usuario_id'] ?? 1;
-
-        // Estrutura o JSON contendo opcionalmente o estado anterior e o atual
-        $payload = [];
-        if ($antes !== null) {
-            $payload['antes'] = $antes;
-        }
-        if ($depois !== null) {
-            $payload['depois'] = $depois;
-        }
-
-        $stmt = $this->pdo->prepare("
-        INSERT INTO viacoes.historico_alteracoes 
-            (entidade_id, entidade_tipo, campo_alterado, valor_antigo, valor_novo, alterado_por, data_alteracao)
-        VALUES 
-            (:entidade_id, 'usuarios', :campo_alterado, null, :valor_novo, :alterado_por, NOW())
-    ");
-
-        $stmt->execute([
-            'entidade_id' => $entidadeId,
-            'campo_alterado' => $acao, // 'criar', 'editar', ou 'deletar'
-            'valor_novo' => json_encode($payload, JSON_UNESCAPED_UNICODE),
-            'alterado_por' => $alteradoPor
-        ]);
     }
 }

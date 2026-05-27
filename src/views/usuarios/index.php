@@ -19,7 +19,7 @@ $busca = $busca ?? '';
             <h1 style="color: white">Usuários</h1>
             <nav class="actions">
                 <a class="btn btn-primary" href="/home">Home</a>
-                <a class="btn btn-primary"  href="/historico/historico">Histórico</a>
+                <a class="btn btn-primary" href="/historico?tab=usuarios">Histórico</a>
                 <a class="btn btn-primary" href="/viacoes/">Viações</a>
                 <a class="btn btn-primary"  href="/logout">Logout</a>
             </nav>
@@ -100,22 +100,22 @@ $busca = $busca ?? '';
 
                 <?php foreach ($usuarios as $usuario): ?>
                     <tr>
-                        <td><strong><?= (int) $usuario['id'] ?></strong></td>
-                        <td><?= htmlspecialchars($usuario['nome'], ENT_QUOTES, 'UTF-8') ?></td>
-                        <td><?= htmlspecialchars($usuario['email'], ENT_QUOTES, 'UTF-8') ?></td>
-                        <td><?= htmlspecialchars(substr($usuario['senha'] ?? '', 0, 20), ENT_QUOTES, 'UTF-8') ?></td>
-                        <td><?= $usuario['status']?></td>
+                        <td><strong><?= (int) $usuario->id ?></strong></td>
+                        <td><?= htmlspecialchars($usuario->nome, ENT_QUOTES,    'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($usuario->email, ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars(substr($usuario->senha ?? '', 0, 20), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= $usuario->status?></td>
 
                         <td class="date-text">
-                            <?= htmlspecialchars($usuario['data_criacao'], ENT_QUOTES, 'UTF-8') ?>
+                            <?= htmlspecialchars($usuario->data_criacao, ENT_QUOTES, 'UTF-8') ?>
                         </td>
                         <td>
                             <div class="actions" style="justify-content: flex-end;">
-                                <a href="/usuarios/<?= (int) $usuario['id'] ?>/edit" class="btn btn-ghost">
+                                <a href="/usuarios/<?= (int) $usuario->id ?>/edit" class="btn btn-ghost">
                                     Editar
                                 </a>
 
-                                <form method="post" action="/usuarios/<?= (int) $usuario['id'] ?>/delete"
+                                <form method="post" action="/usuarios/<?= (int) $usuario->id ?>/delete"
                                       onsubmit="return confirm('Remover este usuário?');">
                                     <button type="submit" class="btn btn-danger">Excluir</button>
                                 </form>

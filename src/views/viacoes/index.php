@@ -1,8 +1,7 @@
 <?php
 declare(strict_types=1);
-use App\Models\Viacao;
 
-/** @var list<Viacao> $viacoes */
+/** @var list<array> $viacoes */
 /** @var string $busca */
 
 $busca = $busca ?? '';
@@ -15,8 +14,9 @@ $busca = $busca ?? '';
             <h1 style="color: white">Viação / Marcas</h1>
             <nav class="actions">
                 <a class="btn btn-primary" href="/home">Home</a>
-                <a class="btn btn-primary"  href="/viacoes/historico">Histórico</a>
-                <a class="btn btn-primary"  href="/logout">Logout</a>
+                <a class="btn btn-primary" href="/historico?tab=viacoes">Histórico</a>
+                <a class="btn btn-primary" href="/usuarios/">Usuários</a>
+                <a class="btn btn-primary" href="/logout">Logout</a>
             </nav>
         </div>
         <a href="/viacoes/create" class="btn btn-primary">
@@ -29,13 +29,11 @@ $busca = $busca ?? '';
         <?php endif; ?>
     </header>
 
-    <!-- Barra de busca -->
     <?php
     $filtros   = $filtros   ?? [];
     $temFiltro = $temFiltro ?? false;
     ?>
 
-    <!--filtros-->
     <form method="get" action="/viacoes" class="search-bar search-bar--multi">
         <div class="search-group search-group--multi">
 
@@ -56,8 +54,8 @@ $busca = $busca ?? '';
 
             <select name="status" class="search-select">
                 <option value="">Todos os status</option>
-                <option value="1" <?= ($filtros['status'] ?? '') === '1' ? 'selected' : '' ?>>Ativo</option>
-                <option value="0" <?= ($filtros['status'] ?? '') === '0' ? 'selected' : '' ?>>Inativo</option>
+                <option value="ativo" <?= ($filtros['status'] ?? '') === 'ativo' ? 'selected' : '' ?>>Ativo</option>
+                <option value="inativo" <?= ($filtros['status'] ?? '') === 'inativo' ? 'selected' : '' ?>>Inativo</option>
             </select>
 
             <button type="submit" class="btn btn-primary">Filtrar</button>
