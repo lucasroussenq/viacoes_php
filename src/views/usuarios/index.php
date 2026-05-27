@@ -90,7 +90,6 @@ $busca = $busca ?? '';
                     <th>ID</th>
                     <th>Nome</th>
                     <th>E-mail</th>
-                    <th>Senha</th>
                     <th>Status</th>
                     <th class="date-text">Criada em</th>
                     <th style="text-align: center;">Ações</th>
@@ -103,7 +102,6 @@ $busca = $busca ?? '';
                         <td><strong><?= (int) $usuario->id ?></strong></td>
                         <td><?= htmlspecialchars($usuario->nome, ENT_QUOTES,    'UTF-8') ?></td>
                         <td><?= htmlspecialchars($usuario->email, ENT_QUOTES, 'UTF-8') ?></td>
-                        <td><?= htmlspecialchars(substr($usuario->senha ?? '', 0, 20), ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= $usuario->status?></td>
 
                         <td class="date-text">
