@@ -30,7 +30,7 @@ $router->post('/viacoes',     [ViacaoController::class, 'store']);
 $router->get('/viacoes/{id}/edit', [ViacaoController::class, 'edit']);
 $router->put('/viacoes/{id}', [ViacaoController::class, 'update']);
 $router->post('/viacoes/{id}/delete', [ViacaoController::class, 'destroy']);
-
+$router->post('/viacoes/{id}/restore', [ViacaoController::class, 'restore']);
 // -----------------------------------------------------------------------------
 // CRUD DE USUÁRIOS
 // -----------------------------------------------------------------------------
@@ -40,3 +40,4 @@ $router->post('/usuarios',            [UsuarioController::class, 'store']);
 $router->get('/usuarios/{id}/edit',   [UsuarioController::class, 'edit']);
 $router->put('/usuarios/{id}',        [UsuarioController::class, 'update']);
 $router->post('/usuarios/{id}/delete', [UsuarioController::class, 'destroy']);
+$router->post('/usuarios/{id}/restore', [UsuarioController::class, 'restore']);

@@ -11,11 +11,13 @@ use PDO;
 final class ViacaoService
 {
     private PDO $pdo;
+    private HistoricoService $historicoService;
 
     /** @param PDO|null $pdo Permite injetar a conexao em testes. */
     public function __construct(?PDO $pdo = null)
     {
         $this->pdo = $pdo ?? \getPdo();
+        $this->historicoService = new HistoricoService($this->pdo);
     }
 
     public function historico(): array
@@ -27,7 +29,7 @@ final class ViacaoService
     /** @return list<array> Retorna todas as marcas não deletadas, da mais nova para a mais antiga. */
     public function all(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM viacoes.viacoes WHERE status != 'deletado' ORDER BY id DESC");
+        $stmt = $this->pdo->query("SELECT * FROM viacoes.viacoes WHERE data_exclusao IS NOT NULL ORDER BY id DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -36,7 +38,8 @@ final class ViacaoService
         ?string $nome   = null,
         ?string $cidade = null,
         ?string $url    = null,
-        ?string $status = null
+        ?string $status = null,
+        ?string $excluido = null
     ): array {
         $where  = [];
         $params = [];
@@ -55,9 +58,12 @@ final class ViacaoService
         }
         if ($status !== null && $status !== '') {
             $where[]          = 'status = :status';
-            $params['status'] = $status;
+            $params['status'] = (int) $status;
+        }
+        if ($excluido !== null && $excluido !== '') {
+            $where[]          = 'data_exclusao IS NOT NULL';
         } else {
-            $where[] = "status != 'deletado'";
+            $where[]          = 'data_exclusao IS NULL';
         }
 
         $whereClause = $where !== [] ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -75,7 +81,10 @@ final class ViacaoService
     public function ativas(): array
     {
         $stmt = $this->pdo->query("SELECT * FROM viacoes.viacoes WHERE status = 'ativo' ORDER BY id DESC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(
+            fn(array $row) => \App\Models\Viacao::fromRow($row),
+            $stmt->fetchAll(PDO::FETCH_ASSOC)
+        );
     }
 
     public function find(int $id)
@@ -116,7 +125,7 @@ final class ViacaoService
             'nome'   => $nome,
             'url'    => $url,
             'cidade' => $cidade,
-            'status' => $status,
+            'status' => $status ? 1 : 0,
             'logo'   => $logo
         ]);
 
@@ -153,7 +162,7 @@ final class ViacaoService
             'url'    => $url,
             'cidade' => $cidade,
             'logo'   => $logo,
-            'status' => $status,
+            'status' => $status ? 1 : 0,
         ]);
 
         // REMOVIDO: O log duplicado que poluía a tabela de auditoria foi removido completamente daqui
@@ -162,16 +171,21 @@ final class ViacaoService
     /** Remove uma marca pelo id. */
     public function delete(int $id): void
     {
-        $stmt = $this->pdo->prepare("UPDATE viacoes.viacoes SET status = 'deletado' WHERE id = :id");
+        $stmt = $this->pdo->prepare("UPDATE viacoes.viacoes SET data_exclusao = NOW() WHERE id = :id");
         $stmt->execute(['id' => $id]);
     }
 
     /** Poder restaurar registros marcados como deletados */
     public function restore(int $id): void
     {
-        $stmt = $this->pdo->prepare("UPDATE viacoes.viacoes SET status = 'ativo' WHERE id = :id");
+        $stmt = $this->pdo->prepare("UPDATE viacoes.viacoes SET data_exclusao = NULL WHERE id = :id");
         $stmt->execute(['id' => $id]);
+
+        // Captura o estado pós-restauração
+        $stmtNew = $this->pdo->prepare("SELECT nome, url, cidade, logo, status FROM viacoes.viacoes WHERE id = :id");
+        $stmtNew->execute(['id' => $id]);
     }
+
 
     private function validateFile(array $file): string
     {

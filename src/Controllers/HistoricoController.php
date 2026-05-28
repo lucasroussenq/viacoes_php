@@ -22,9 +22,11 @@ final class HistoricoController
         }
 
         // Filtra a aba atual vinda da URL (?tab=viacoes ou ?tab=usuarios)
-        $tabAtual = $_GET['tab'] ?? 'viacoes';
-        if (!in_array($tabAtual, ['viacoes', 'usuarios'], true)) {
-            $tabAtual = 'viacoes';
+        // No seu HistoricoController.php
+        $tabAtual = $_GET['tab'] ?? ''; // Deixe vazio por padrão em vez de 'viacoes'
+
+        if (!in_array($tabAtual, ['viacoes', 'usuarios', ''], true)) {
+            $tabAtual = '';
         }
 
         // Normaliza os filtros vindos dos campos de input da barra de pesquisa

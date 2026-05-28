@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS usuarios
     status     TINYINT(1)   NOT NULL DEFAULT 1,
     data_criacao TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP    NULL     DEFAULT NULL
-        ON UPDATE CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    data_exclusao TIMESTAMP    NULL     DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -28,7 +29,8 @@ CREATE TABLE IF NOT EXISTS viacoes
     status     TINYINT(1)   NOT NULL DEFAULT 1,
     data_criacao TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP    NULL     DEFAULT NULL
-        ON UPDATE CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    data_exclusao TIMESTAMP    NULL     DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -118,26 +120,3 @@ CREATE TABLE IF NOT EXISTS historico_alteracoes (
                                       alterado_por INT,                    -- ID do usuário que fez a alteração
                                       data_alteracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-ALTER TABLE viacoes MODIFY COLUMN status VARCHAR(20);
-
-UPDATE viacoes
-SET viacoes.status = CASE
-                      WHEN viacoes.status = '0' THEN 'inativo'
-                      WHEN viacoes.status = '1' THEN 'ativo'
-
-    END;
-
-ALTER TABLE viacoes MODIFY COLUMN status ENUM('inativo', 'ativo', 'deletado');
-
-ALTER TABLE usuarios MODIFY COLUMN status VARCHAR(20);
-
-UPDATE usuarios
-SET usuarios.status = CASE
-                         WHEN usuarios.status = '0' THEN 'inativo'
-                         WHEN usuarios.status = '1' THEN 'ativo'
-
-    END;
-
-ALTER TABLE usuarios MODIFY COLUMN status ENUM('inativo', 'ativo', 'deletado');
-

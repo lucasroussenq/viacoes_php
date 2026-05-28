@@ -180,7 +180,7 @@ final class UsuarioService
         $stmtOld->execute(['id' => $id]);
         $usuarioAntigo = $stmtOld->fetch(PDO::FETCH_ASSOC);
 
-        $stmt = $this->pdo->prepare("UPDATE viacoes.usuarios SET status = 'deletado' WHERE id = :id");
+        $stmt = $this->pdo->prepare("UPDATE viacoes.usuarios SET data_exclusao = now() WHERE id = :id");
         $stmt = $stmt->execute(['id' => $id]);
 
         if ($usuarioAntigo) {

@@ -1,5 +1,5 @@
 <?php
-//Representa um usuário do sistema com id, nome, email e senha (hash).
+//Representa um usuário do sistema com id, nome, email, senha (hash) e status.
 // O fromRow() formata a data para o fuso de São Paulo.
 declare(strict_types=1);
 
@@ -12,6 +12,7 @@ final class Usuario
         public string $nome,
         public string $email,
         public string $senha,
+        public string $status,
         public ?string $data_criacao,
     ) {
     }
@@ -23,6 +24,7 @@ final class Usuario
             nome: (string) $row['nome'],
             email: (string) $row['email'],
             senha: (string) $row['senha'],
+            status: (string) $row['status'], // ADICIONADO: puxa o status vindo do banco
 
             data_criacao: ($row['data_criacao'] !== null)
                 ? (new \DateTime($row['data_criacao']))

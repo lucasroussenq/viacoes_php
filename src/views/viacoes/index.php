@@ -54,8 +54,13 @@ $busca = $busca ?? '';
 
             <select name="status" class="search-select">
                 <option value="">Todos os status</option>
-                <option value="ativo" <?= ($filtros['status'] ?? '') === 'ativo' ? 'selected' : '' ?>>Ativo</option>
-                <option value="inativo" <?= ($filtros['status'] ?? '') === 'inativo' ? 'selected' : '' ?>>Inativo</option>
+                <option value="1" <?= ($filtros['status'] ?? '') === '1' ? 'selected' : '' ?>>Ativo</option>
+                <option value="0" <?= ($filtros['status'] ?? '') === '0' ? 'selected' : '' ?>>Inativo</option>
+            </select>
+
+            <select name="excluido" class="search-select">">
+                <option value="">Apenas não excluídas</option>
+                <option value="1" <?= ($filtros['excluido'] ?? '') === '1' ? 'selected' : '' ?>>Excluído</option>
             </select>
 
             <button type="submit" class="btn btn-primary">Filtrar</button>
@@ -123,11 +128,17 @@ $busca = $busca ?? '';
                                 <a href="/viacoes/<?= (int) $viacao->id ?>/edit" class="btn btn-ghost">
                                     Editar
                                 </a>
-
-                                <form method="post" action="/viacoes/<?= (int) $viacao->id ?>/delete"
-                                      onsubmit="return confirm('Remover esta marca?');">
-                                    <button type="submit" class="btn btn-danger">Excluir</button>
-                                </form>
+                                <?php if (!isset($viacao->data_exclusao)): ?>
+                                    <form method="post" action="/viacoes/<?= (int) $viacao->id ?>/delete"
+                                          onsubmit="return confirm('Remover esta marca?');">
+                                        <button type="submit" class="btn btn-danger">Excluir</button>
+                                    </form>
+                                        <?php else: ?>
+                                    <form method="post" action="/viacoes/<?= (int) $viacao->id ?>/restore"
+                                          onsubmit="return confirm('Restaurar esta marca?');">
+                                        <button type="submit" class="btn btn-danger">Restaurar</button>
+                                    </form>
+                                <?php endif ?>
                             </div>
                         </td>
                     </tr>

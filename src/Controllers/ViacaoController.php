@@ -68,21 +68,23 @@ final class ViacaoController
         $cidade = trim((string) ($_GET['cidade'] ?? ''));
         $url    = trim((string) ($_GET['url']    ?? ''));
         $status = $_GET['status'] ?? '';
+        $excluido = $_GET['excluido'] ?? '';
 
         $viacoes = $this->viacaoService->listar(
             $nome   !== '' ? $nome   : null,
             $cidade !== '' ? $cidade : null,
             $url    !== '' ? $url    : null,
             $status !== '' ? $status : null,
+            $excluido !== '' ? $excluido : null
         );
 
-        $temFiltro = $nome !== '' || $cidade !== '' || $url !== '' || $status !== '';
+        $temFiltro = $nome !== '' || $cidade !== '' || $url !== '' || $status !== '' || $excluido !== '';
 
         View::render('viacoes/index', [
             'title'     => 'Viações',
             'viacoes'   => $viacoes,
             'temFiltro' => $temFiltro,
-            'filtros'   => compact('nome', 'cidade', 'url', 'status'),
+            'filtros'   => compact('nome', 'cidade', 'url', 'status', 'excluido'),
         ]);
     }
 
@@ -272,7 +274,34 @@ final class ViacaoController
 
         $this->viacaoService->delete($id);
 
-        View::flash('success', 'Viação removed com sucesso.');
+        View::flash('success', 'Viação removida com sucesso.');
+        View::redirect('/viacoes');
+    }
+
+    public function restore(int $id): void
+    {
+        $viacao = $this->viacaoService->find($id);
+
+        if ($viacao === null) {
+            http_response_code(404);
+            echo 'Viação não encontrada.';
+            return;
+        }
+
+        $this->historicoService->criar(
+            usuarioId:    $this->getAdminId(),
+            entidadeId:   $id,
+            acao:         'RESTORE',
+            dados: [
+                'antes'  => null,
+                'depois' => $this->snapshot($viacao)
+            ],
+            entidadeTipo: 'viacoes'
+        );
+
+        $this->viacaoService->restore($id);
+
+        View::flash('success', 'Viação restaurada com sucesso.');
         View::redirect('/viacoes');
     }
 
