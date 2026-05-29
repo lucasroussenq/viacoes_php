@@ -60,6 +60,11 @@ $busca = $busca ?? '';
                 <option value="0" <?= ($filtros['status'] ?? '') === '0' ? 'selected' : '' ?>>Inativo</option>
             </select>
 
+            <select name="excluido" class="search-select">
+                <option value="">Apenas não excluídas</option>
+                <option value="1" <?= ($filtros['excluido'] ?? '') === '1' ? 'selected' : '' ?>>Excluído</option>
+            </select>
+
             <button type="submit" class="btn btn-primary">Filtrar</button>
 
             <?php if ($temFiltro): ?>
@@ -97,26 +102,53 @@ $busca = $busca ?? '';
                 </thead>
                 <tbody>
 
+                <tbody>
                 <?php foreach ($usuarios as $usuario): ?>
+                    <?php
+                    // Regra do TINYINT + data_exclusao para o Usuário
+                    $isDeletado = (!$usuario->status && !empty($usuario->data_exclusao));
+                    $isAtivo    = ($usuario->status === true);
+                    ?>
                     <tr>
                         <td><strong><?= (int) $usuario->id ?></strong></td>
-                        <td><?= htmlspecialchars($usuario->nome, ENT_QUOTES,    'UTF-8') ?></td>
+                        <td>
+                            <a href="/usuarios/<?= (int) $usuario->id ?>" style="text-decoration: none; color: #000000; font-weight: bold;">
+                                <?= htmlspecialchars($usuario->nome, ENT_QUOTES, 'UTF-8') ?>
+                            </a>
+                        </td>
                         <td><?= htmlspecialchars($usuario->email, ENT_QUOTES, 'UTF-8') ?></td>
-                        <td><?= $usuario->status?></td>
+                        <td>
+                            <?php if ($isDeletado): ?>
+                                <span class="badge badge-inactive" style="background: #dc3545; color: #ffffff; border-color: #dc3545;">Deletado</span>
+                            <?php elseif ($isAtivo): ?>
+                                <span class="badge badge-active">Ativo</span>
+                            <?php else: ?>
+                                <span class="badge badge-inactive">Inativo</span>
+                            <?php endif; ?>
+                        </td>
 
                         <td class="date-text">
-                            <?= htmlspecialchars($usuario->data_criacao, ENT_QUOTES, 'UTF-8') ?>
+                            <?= htmlspecialchars($usuario->data_criacao ?? '', ENT_QUOTES, 'UTF-8') ?>
                         </td>
                         <td>
-                            <div class="actions" style="justify-content: flex-end;">
+                            <div class="actions" style="justify-content: flex-end; gap: 8px;">
                                 <a href="/usuarios/<?= (int) $usuario->id ?>/edit" class="btn btn-ghost">
                                     Editar
                                 </a>
 
-                                <form method="post" action="/usuarios/<?= (int) $usuario->id ?>/delete"
-                                      onsubmit="return confirm('Remover este usuário?');">
-                                    <button type="submit" class="btn btn-danger">Excluir</button>
-                                </form>
+                                <?php if ($isDeletado): ?>
+                                    <form method="post" action="/usuarios/<?= (int) $usuario->id ?>/restore"
+                                          onsubmit="return confirm('Restaurar este usuário?');" style="display: inline;">
+                                        <button type="submit" class="btn btn-ghost">
+                                            Restaurar
+                                        </button>
+                                    </form>
+                                <?php else: ?>
+                                    <form method="post" action="/usuarios/<?= (int) $usuario->id ?>/delete"
+                                          onsubmit="return confirm('Remover este usuário?');" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger">Excluir</button>
+                                    </form>
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>
@@ -124,5 +156,5 @@ $busca = $busca ?? '';
                 </tbody>
             </table>
         </div>
-    <?php endif; ?>
 </main>
+    <?php endif; ?>

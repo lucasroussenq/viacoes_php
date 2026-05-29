@@ -116,10 +116,13 @@ $busca = $busca ?? '';
                         <td>
                             <?php if ($viacao->status): ?>
                                 <span class="badge badge-active">Ativo</span>
+                            <?php elseif (!empty($viacao->data_exclusao)): ?>
+                                <span class="badge badge-inactive" style="background: #dc3545; color: #ffffff; border-color: #dc3545;">Deletado</span>
                             <?php else: ?>
                                 <span class="badge badge-inactive">Inativo</span>
                             <?php endif; ?>
                         </td>
+
                         <td class="date-text">
                             <?= htmlspecialchars($viacao->data_criacao, ENT_QUOTES, 'UTF-8') ?>
                         </td>

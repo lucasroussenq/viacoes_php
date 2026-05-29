@@ -25,11 +25,26 @@ final class ViacaoController
         $this->historicoService = new HistoricoService();
     }
 
+    /** action: Visualizar os detalhes de uma única viação */
+    public function show(int $id): void
+    {
+        $viacao = $this->viacaoService->find($id);
+
+        if ($viacao === null) {
+            http_response_code(404);
+            echo 'Viação não encontrada.';
+            return;
+        }
+
+        View::render('viacoes/show', [
+            'title'  => 'Visualizar Viação - ' . $viacao->nome,
+            'viacao' => $viacao
+        ]);
+    }
+
     /** Bloqueia acesso de usuários não autenticados. */
     private function verificarLogin(): void
     {
-        // Se seu sistema usa 'usuario_id' ou 'user_id', certifique-se de validar o correto.
-        // Mantido 'user_id' conforme o seu código original.
         if (empty($_SESSION['user_id']) && empty($_SESSION['usuario_id'])) {
             View::redirect('/login');
             exit;
@@ -42,22 +57,23 @@ final class ViacaoController
         return (int)($_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? 1);
     }
 
-    /** * CORREÇÃO DA SESSÃO DE SNAPSHOT: Retorna o status tratado puramente como string ('ativo' ou 'inativo')
-     * @return array{nome: string, url: string, cidade: string, status: string, logo: string|null}
-     */
+    /** Retorna o status tratado puramente como string, levando em conta a data de exclusão */
     private function snapshot(Viacao $v): array
     {
         $statusString = 'inativo';
-        if ($v->status === true || $v->status === '1' || $v->status === 1 || $v->status === 'ativo') {
+        if ($v->status === true || $v->status === 1) {
             $statusString = 'ativo';
+        } elseif (!empty($v->data_exclusao)) {
+            $statusString = 'deletado';
         }
 
         return [
-            'nome'   => $v->nome,
-            'url'    => $v->url,
-            'cidade' => $v->cidade,
-            'status' => $statusString,
-            'logo'   => $v->logo,
+            'nome'          => $v->nome,
+            'url'           => $v->url,
+            'cidade'        => $v->cidade,
+            'status'        => $statusString,
+            'logo'          => $v->logo,
+            'data_exclusao' => $v->data_exclusao
         ];
     }
 
@@ -145,7 +161,6 @@ final class ViacaoController
         $id = $this->viacaoService->create($nomeViacao, $url, $cidade, $status, $file);
         $viaCriada = $this->viacaoService->find($id);
 
-        // CORREÇÃO DOS PARÂMETROS NOMEADOS: Mapeado estritamente com os nomes da assinatura do HistoricoService
         $this->historicoService->criar(
             usuarioId:    $this->getAdminId(),
             entidadeId:   $id,
@@ -186,7 +201,7 @@ final class ViacaoController
         ]);
     }
 
-    /** Processa o PUT de atualização. */
+    /** Processa o PUT de atualização gerindo os status numéricos e a data de exclusão */
     public function update(int $id): void
     {
         $viacaoEditar = $this->viacaoService->find($id);
@@ -197,19 +212,22 @@ final class ViacaoController
             return;
         }
 
-        $snapshotAntes = [
-            'nome'   => $viacaoEditar->nome,
-            'url'    => $viacaoEditar->url,
-            'cidade' => $viacaoEditar->cidade,
-            'status' => ($viacaoEditar->status === true || $viacaoEditar->status === '1' || $viacaoEditar->status === 1 || $viacaoEditar->status === 'ativo') ? 'ativo' : 'inativo',
-            'logo'   => $viacaoEditar->logo,
-        ];
+        $snapshotAntes = $this->snapshot($viacaoEditar);
 
         $nomeViacao = trim((string) ($_POST['nome']   ?? ''));
         $url        = trim((string) ($_POST['url']    ?? ''));
         $cidade     = trim((string) ($_POST['cidade'] ?? ''));
 
-        $status = (isset($_POST['status']) && ($_POST['status'] === '1' || $_POST['status'] === 'ativo')) ? 'ativo' : 'inativo';
+        $statusForm = $_POST['status'] ?? 'ativo';
+
+        $status = ($statusForm === 'ativo') ? 1 : 0;
+
+        $dataExclusao = null;
+        if ($statusForm === 'deletado') {
+            $dataExclusao = (new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')))->format('Y-m-d H:i:s');
+        } elseif ($statusForm === 'inativo' && !empty($viacaoEditar->data_exclusao)) {
+            $dataExclusao = null;
+        }
 
         $errors = $this->validateName($nomeViacao);
 
@@ -221,7 +239,7 @@ final class ViacaoController
                 'old'    => [
                     'nome'   => $nomeViacao,
                     'logo'   => $viacaoEditar->logo ?? '',
-                    'status' => $status,
+                    'status' => $statusForm,
                     'url'    => $url,
                     'cidade' => $cidade,
                 ],
@@ -231,7 +249,7 @@ final class ViacaoController
 
         $file = (!empty($_FILES['logo']['name'])) ? $_FILES['logo'] : null;
 
-        $this->viacaoService->update($id, $nomeViacao, $cidade, $status, $url, $file);
+        $this->viacaoService->update($id, $nomeViacao, $cidade, $status, $url, $file, $dataExclusao);
 
         $viacaoAtualizada = $this->viacaoService->find($id);
 

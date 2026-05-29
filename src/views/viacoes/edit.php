@@ -6,8 +6,9 @@ use App\Models\Viacao;
 
 /** @var Viacao $viacao */
 /** @var list<string> $errors */
-/** @var array{nome: string, cidade: string, status: bool, url: string, logo: string} $old */
+/** @var array $old */
 
+// CORREÇÃO: Variáveis escritas corretamente e sem possibilidade de nulo
 $action = "/viacoes/{$viacao->id}";
 $method = "PUT";
 $old    = $old ?? [];

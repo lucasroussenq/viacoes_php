@@ -13,7 +13,7 @@ final class Viacao
         public ?string $logo,
         public string $url,
         public string $cidade,
-        public bool $status, // Mantido como bool para compatibilidade
+        public bool $status,
         public ?string $data_criacao,
         public ?string $data_exclusao,
     ) {

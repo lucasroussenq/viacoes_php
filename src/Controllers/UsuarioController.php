@@ -3,36 +3,76 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\View;
+use App\Models\Usuario;
 use App\Services\UsuarioService;
+use App\Services\HistoricoService;
+
 
 final class UsuarioController
 {
     private UsuarioService $usuarioService;
+    private HistoricoService $historicoService;
+
 
     public function __construct(?UsuarioService $usuarioService = null)
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $this->usuarioService = $usuarioService ?? new UsuarioService();
+        $this->historicoService = new HistoricoService();
     }
+
+
+    public function show(int $id): void
+    {
+        $usuario = $this->usuarioService->find($id);
+
+        if ($usuario === null) {
+            http_response_code(404);
+            echo 'Usuário não encontrado.';
+            return;
+        }
+
+        View::render('usuarios/show', [
+            'title'   => 'Detalhes do Usuário - ' . $usuario->nome,
+            'usuario' => $usuario
+        ]);
+    }
+
+    private function getAdminId(): int
+    {
+        return (int)($_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? 1);
+    }
+
 
     /**
      * Apenas recebe os parâmetros de busca e passa para o Service
      */
     public function index(): void
     {
-        $filtros = [
-            'nome'   => $_GET['nome'] ?? '',
-            'email'  => $_GET['email'] ?? '',
-            'status' => $_GET['status'] ?? ''
-        ];
+        $nome   = trim((string) ($_GET['nome']   ?? ''));
+        $email = trim((string) ($_GET['email'] ?? ''));
+        $status = $_GET['status'] ?? '';
+        $excluido = $_GET['excluido'] ?? '';
 
-        $temFiltro = ($filtros['nome'] !== '' || $filtros['email'] !== '' || $filtros['status'] !== '');
+        $usuarios = $this->usuarioService->listar(
+            $nome   !== '' ? $nome   : null,
+            $email !== '' ? $email : null,
+            $status !== '' ? $status : null,
+            $excluido !== '' ? $excluido : null
+        );
 
-        // O Service agora é quem se vira para trazer filtrado
-        $usuarios = $this->usuarioService->all($filtros);
+        $temFiltro = $nome !== '' || $email !== '' || $status !== '' || $excluido !== '';
 
-        require __DIR__ . '/../views/usuarios/index.php';
+        View::render('usuarios/index', [
+            'title'     => 'Usuários',
+            'usuarios'   => $usuarios,
+            'temFiltro' => $temFiltro,
+            'filtros'   => compact('nome', 'email', 'status', 'excluido'),
+        ]);
     }
-
     public function create(): void
     {
         $errors = [];
@@ -54,7 +94,7 @@ final class UsuarioController
             return;
         }
 
-        $this->usuarioService->create($nome, $email, $senha, $status);
+        $this->usuarioService->criar($nome, $email, $senha, $status);
 
         header('Location: /usuarios');
         exit;
@@ -78,28 +118,89 @@ final class UsuarioController
     {
         $nome   = trim((string)($_POST['nome'] ?? ''));
         $email  = trim((string)($_POST['email'] ?? ''));
-        $senha  = $_POST['senha'] ?? ''; // Captura a senha do POST
+        $senha  = $_POST['senha'] ?? '';
 
-        $status = (isset($_POST['status']) && $_POST['status'] === '1') ? 'ativo' : 'inativo';
+        $statusForm = $_POST['status'] ?? 'ativo';
+
+        $status = ($statusForm === 'ativo') ? 1 : 0;
+
+        $dataExclusao = null;
+        if ($statusForm === 'deletado') {
+            $dataExclusao = (new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')))->format('Y-m-d H:i:s');
+        }
 
         if ($nome === '' || $email === '') {
             $usuario = $this->usuarioService->find($id);
-            $errors = ['Nome e E-mail não podem ficar vazios.'];
+            $errors  = ['Nome e E-mail não podem ficar vazios.'];
+
+            $old = [
+                'nome'   => $nome,
+                'email'  => $email,
+                'status' => $statusForm
+            ];
+
             require __DIR__ . '/../views/usuarios/edit.php';
             return;
         }
 
-        $this->usuarioService->update($id, $nome, $email, $status, $senha !== '' ? $senha : null);
+        $this->usuarioService->update(
+            id: $id,
+            nome: $nome,
+            email: $email,
+            status: $status,
+            novaSenha: ($senha !== '' ? $senha : null),
+            dataExclusao: $dataExclusao
+        );
 
         header('Location: /usuarios');
         exit;
     }
-
     public function destroy(int $id): void
     {
         $this->usuarioService->delete($id);
 
         header('Location: /usuarios');
         exit;
+    }
+
+    private function snapshot(\App\Models\Usuario $usuario): array
+    {
+        return [
+            'id'            => $usuario->id,
+            'nome'          => $usuario->nome,
+            'email'         => $usuario->email,
+            'senha'         => $usuario->senha,
+            'status'        => $usuario->status,
+            'data_criacao'  => $usuario->data_criacao,
+            'data_exclusao' => $usuario->data_exclusao,
+        ];
+    }
+
+
+    public function restore(int $id): void
+    {
+        $usuario = $this->usuarioService->find($id);
+
+        if ($usuario === null) {
+            http_response_code(404);
+            echo 'Usuário não encontrado.';
+            return;
+        }
+
+        $this->historicoService->criar(
+            usuarioId:    $this->getAdminId(),
+            entidadeId:   $id,
+            acao:         'RESTORE',
+            dados: [
+                'antes'  => null,
+                'depois' => $this->snapshot($usuario)
+            ],
+            entidadeTipo: 'usuarios'
+        );
+
+        $this->usuarioService->restore($id);
+
+        View::flash('success', 'Usuário restaurado com sucesso.');
+        View::redirect('/usuarios');
     }
 }

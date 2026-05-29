@@ -43,30 +43,29 @@
         </div>
 
         <div class="form-group">
-            <label>Status</label>
-            <div class="radio-group">
-                <label>
-                    <input
-                        type="radio"
-                        name="status"
-                        value="1"
-                        <?= (!isset($old['status']) || $old['status'] === '1' || $old['status'] === 'ativo') ? 'checked' : '' ?>
-                    >
+            <label for="status">Status</label>
+            <?php
+
+            $statusAtual = $old['status'] ?? ($usuario->status ?? 'ativo');
+
+            $isAtivo    = ($statusAtual === 'ativo' || $statusAtual === true || $statusAtual === 1 || $statusAtual === '1');
+            $isDeletado = ($statusAtual === 'deletado' || (!empty($usuario->data_exclusao) && !$isAtivo));
+            $isInativo  = (!$isAtivo && !$isDeletado);
+            ?>
+            <select name="status" id="status" class="search-select" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; background-color: #fff; font-size: 14px; margin-top: 5px;">
+                <option value="ativo" <?= $isAtivo ? 'selected' : '' ?>>
                     Ativo
-                </label>
+                </option>
 
-                <label>
-                    <input
-                        type="radio"
-                        name="status"
-                        value="0"
-                        <?= (isset($old['status']) && ($old['status'] === '0' || $old['status'] === 'inativo')) ? 'checked' : '' ?>
-                    >
+                <option value="inativo" <?= $isInativo ? 'selected' : '' ?>>
                     Inativo
-                </label>
-            </div>
-        </div>
+                </option>
 
+                <option value="deletado" <?= $isDeletado ? 'selected' : '' ?>>
+                    Excluído (Deletado)
+                </option>
+            </select>
+        </div>
         <button type="submit">Salvar</button>
     </form>
 </div>

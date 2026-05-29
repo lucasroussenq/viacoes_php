@@ -87,19 +87,23 @@ final class ViacaoService
         );
     }
 
-    public function find(int $id)
+    public function find(int $id): ?\App\Models\Viacao
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM viacoes.viacoes WHERE id = :id AND status != 'deletado'");
-        $stmt->execute(['id' => $id]);
+        $stmt = $this->pdo->prepare('
+        SELECT id, nome, logo, url, cidade, status, data_criacao, data_exclusao 
+        FROM viacoes.viacoes 
+        WHERE id = :id
+    ');
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!is_array($row)) {
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$row) {
             return null;
         }
 
         return \App\Models\Viacao::fromRow($row);
     }
-
     /** Cria uma marca e retorna o id gerado. */
     public function create(
         ?string $nome,
@@ -130,7 +134,6 @@ final class ViacaoService
         ]);
 
         return (int)$this->pdo->lastInsertId();
-        // REMOVIDO: O log interno foi removido para não duplicar com o HistoricoService chamado no Controller
     }
 
     /** Atualiza os campos de uma marca existente. */
@@ -138,9 +141,10 @@ final class ViacaoService
         int $id,
         string $nome,
         ?string $cidade,
-        string $status,
+        int $status,
         ?string $url,
-        ?array $file = null
+        ?array $file = null,
+        ?string $dataExclusao = null
     ): void {
         $stmt = $this->pdo->prepare('SELECT logo FROM viacoes.viacoes WHERE id = :id');
         $stmt->execute(['id' => $id]);
@@ -153,19 +157,25 @@ final class ViacaoService
         }
 
         $stmt = $this->pdo->prepare(
-            'UPDATE viacoes.viacoes SET nome = :nome, url = :url, cidade = :cidade, logo = :logo, status = :status WHERE id = :id'
+            'UPDATE viacoes.viacoes 
+         SET nome = :nome, 
+             url = :url, 
+             cidade = :cidade, 
+             logo = :logo, 
+             status = :status, 
+             data_exclusao = :data_exclusao 
+         WHERE id = :id'
         );
 
         $stmt->execute([
-            'id'     => $id,
-            'nome'   => $nome,
-            'url'    => $url,
-            'cidade' => $cidade,
-            'logo'   => $logo,
-            'status' => $status ? 1 : 0,
+            'id'            => $id,
+            'nome'          => $nome,
+            'url'           => $url,
+            'cidade'        => $cidade,
+            'logo'          => $logo,
+            'status'        => $status,
+            'data_exclusao' => $dataExclusao,
         ]);
-
-        // REMOVIDO: O log duplicado que poluía a tabela de auditoria foi removido completamente daqui
     }
 
     /** Remove uma marca pelo id. */
@@ -186,6 +196,19 @@ final class ViacaoService
         $stmtNew->execute(['id' => $id]);
     }
 
+
+    public function view(int $id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM viacoes.viacoes WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!is_array($row)) {
+            return null;
+        }
+
+        return \App\Models\Viacao::fromRow($row);
+    }
 
     private function validateFile(array $file): string
     {

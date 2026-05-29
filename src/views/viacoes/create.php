@@ -3,15 +3,15 @@
 declare(strict_types=1);
 
 /** @var list<string> $errors */
-/** @var array{nome: string, cidade: string, status: bool, url: string, logo: string} $old */
+/** @var array $old */
 
-$action  = "/viacoes";
-$method  = null;
-$viacao  = null;
-$old     = $old ?? [];
+// Definições necessárias para o form.php não dar "Undefined variable" no Create
+$action = "/viacoes";
+$method = "POST"; // Cadastro comum usa POST puro
+$old    = $old ?? [];
 ?>
 
-    <h1>Criar marca</h1>
+    <h1>Criar viação</h1>
 
 <?php if ($errors !== []): ?>
     <div class="alert alert--danger">
