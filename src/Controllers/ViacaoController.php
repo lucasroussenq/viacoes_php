@@ -36,9 +36,16 @@ final class ViacaoController
             return;
         }
 
+        // Busca apenas as alterações DESTA viação
+        $historico = $this->historicoService->getHistory([
+            'tab'  => 'viacoes',
+            'alvo' => (string) $id
+        ]);
+
         View::render('viacoes/show', [
-            'title'  => 'Visualizar Viação - ' . $viacao->nome,
-            'viacao' => $viacao
+            'title'     => 'Visualizar Viação - ' . $viacao->nome,
+            'viacao'    => $viacao,
+            'historico' => $historico
         ]);
     }
 
@@ -58,13 +65,14 @@ final class ViacaoController
     }
 
     /** Retorna o status tratado puramente como string, levando em conta a data de exclusão */
+    /** Retorna o status tratado puramente como string, levando em conta a data de exclusão */
     private function snapshot(Viacao $v): array
     {
-        $statusString = 'inativo';
-        if ($v->status === true || $v->status === 1) {
-            $statusString = 'ativo';
-        } elseif (!empty($v->data_exclusao)) {
+        // Se a data de exclusão NÃO estiver vazia, o status obrigatoriamente é deletado
+        if (!empty($v->data_exclusao)) {
             $statusString = 'deletado';
+        } else {
+            $statusString = ($v->status === true || $v->status === 1 || $v->status === 'ativo') ? 'ativo' : 'inativo';
         }
 
         return [
@@ -202,6 +210,7 @@ final class ViacaoController
     }
 
     /** Processa o PUT de atualização gerindo os status numéricos e a data de exclusão */
+    /** Processa o PUT de atualização gerindo os status numéricos e a data de exclusão */
     public function update(int $id): void
     {
         $viacaoEditar = $this->viacaoService->find($id);
@@ -218,15 +227,14 @@ final class ViacaoController
         $url        = trim((string) ($_POST['url']    ?? ''));
         $cidade     = trim((string) ($_POST['cidade'] ?? ''));
 
-        $statusForm = $_POST['status'] ?? 'ativo';
+        // Recebe o valor do rádio ('1', '0' ou 'deletado')
+        $statusForm = $_POST['status'] ?? '1';
 
-        $status = ($statusForm === 'ativo') ? 1 : 0;
+        $status = ($statusForm === '1' || $statusForm === 'ativo') ? 1 : 0;
 
         $dataExclusao = null;
         if ($statusForm === 'deletado') {
             $dataExclusao = (new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')))->format('Y-m-d H:i:s');
-        } elseif ($statusForm === 'inativo' && !empty($viacaoEditar->data_exclusao)) {
-            $dataExclusao = null;
         }
 
         $errors = $this->validateName($nomeViacao);
@@ -265,61 +273,6 @@ final class ViacaoController
         );
 
         View::flash('success', 'Viação actualizada com sucesso.');
-        View::redirect('/viacoes');
-    }
-
-    /** Remove uma viação. */
-    public function destroy(int $id): void
-    {
-        $viacao = $this->viacaoService->find($id);
-
-        if ($viacao === null) {
-            http_response_code(404);
-            echo 'Viação não encontrada.';
-            return;
-        }
-
-        $this->historicoService->criar(
-            usuarioId:    $this->getAdminId(),
-            entidadeId:   $id,
-            acao:         'DELETE',
-            dados: [
-                'antes'  => $this->snapshot($viacao),
-                'depois' => null,
-            ],
-            entidadeTipo: 'viacoes'
-        );
-
-        $this->viacaoService->delete($id);
-
-        View::flash('success', 'Viação removida com sucesso.');
-        View::redirect('/viacoes');
-    }
-
-    public function restore(int $id): void
-    {
-        $viacao = $this->viacaoService->find($id);
-
-        if ($viacao === null) {
-            http_response_code(404);
-            echo 'Viação não encontrada.';
-            return;
-        }
-
-        $this->historicoService->criar(
-            usuarioId:    $this->getAdminId(),
-            entidadeId:   $id,
-            acao:         'RESTORE',
-            dados: [
-                'antes'  => null,
-                'depois' => $this->snapshot($viacao)
-            ],
-            entidadeTipo: 'viacoes'
-        );
-
-        $this->viacaoService->restore($id);
-
-        View::flash('success', 'Viação restaurada com sucesso.');
         View::redirect('/viacoes');
     }
 

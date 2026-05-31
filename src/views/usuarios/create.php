@@ -12,7 +12,18 @@ $old     = $old ?? [];
 ?>
     <title>Criar Usuário</title>
 
+<header class="page-header">
+    <div>
+        <nav class="actions">
+            <a class="btn btn-primary btn-headerlay" href="/usuarios">Usuários</a>
+            <a class="btn btn-primary btn-headerlay" href="/usuarios/create">Novo usuário</a>
+        </nav>
+    </div>
+</header>
+
     <h1>Criar usuário</h1>
+
+
 
 <?php if ($errors !== []): ?>
     <div class="alert alert--danger">

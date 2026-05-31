@@ -41,3 +41,6 @@ $router->get('/usuarios/{id}/edit',   [UsuarioController::class, 'edit']);
 $router->put('/usuarios/{id}',        [UsuarioController::class, 'update']);
 $router->post('/usuarios/{id}/delete', [UsuarioController::class, 'destroy']);
 $router->post('/usuarios/{id}/restore', [UsuarioController::class, 'restore']);
+// Rotas de visualização única
+$router->get('/usuarios/{id}', [App\Controllers\UsuarioController::class, 'show']);
+$router->get('/viacoes/{id}', [App\Controllers\ViacaoController::class, 'show']);$router->get('/viacoes/(\d+)', [App\Controllers\ViacaoController::class, 'show']);

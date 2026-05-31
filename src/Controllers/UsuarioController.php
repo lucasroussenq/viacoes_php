@@ -35,9 +35,15 @@ final class UsuarioController
             return;
         }
 
+        $historico = $this->historicoService->getHistory([
+            'tab'  => 'usuarios',
+            'alvo' => (string) $id
+        ]);
+
         View::render('usuarios/show', [
-            'title'   => 'Detalhes do Usuário - ' . $usuario->nome,
-            'usuario' => $usuario
+            'title'     => 'Detalhes do Usuário - ' . $usuario->nome,
+            'usuario'   => $usuario,
+            'historico' => $historico
         ]);
     }
 
@@ -116,13 +122,14 @@ final class UsuarioController
 
     public function update(int $id): void
     {
-        $nome   = trim((string)($_POST['nome'] ?? ''));
-        $email  = trim((string)($_POST['email'] ?? ''));
-        $senha  = $_POST['senha'] ?? '';
+        $nome  = trim((string)($_POST['nome'] ?? ''));
+        $email = trim((string)($_POST['email'] ?? ''));
+        $senha = $_POST['senha'] ?? ''; // Mantido aqui caso venha de outra rota, mas sumirá do form.php
 
-        $statusForm = $_POST['status'] ?? 'ativo';
+        // Recebe o valor do rádio ('1', '0' ou 'deletado')
+        $statusForm = $_POST['status'] ?? '1';
 
-        $status = ($statusForm === 'ativo') ? 1 : 0;
+        $status = ($statusForm === '1' || $statusForm === 'ativo') ? 1 : 0;
 
         $dataExclusao = null;
         if ($statusForm === 'deletado') {
@@ -165,17 +172,22 @@ final class UsuarioController
 
     private function snapshot(\App\Models\Usuario $usuario): array
     {
+        // Se houver data de exclusão, o status textual vira 'deletado'
+        if (!empty($usuario->data_exclusao)) {
+            $statusString = 'deletado';
+        } else {
+            $statusString = ($usuario->status == 1 || $usuario->status === true || $usuario->status === 'ativo') ? 'ativo' : 'inativo';
+        }
+
         return [
             'id'            => $usuario->id,
             'nome'          => $usuario->nome,
             'email'         => $usuario->email,
-            'senha'         => $usuario->senha,
-            'status'        => $usuario->status,
+            'status'        => $statusString, // Agora vai salvo como texto explicativo no histórico
             'data_criacao'  => $usuario->data_criacao,
             'data_exclusao' => $usuario->data_exclusao,
         ];
     }
-
 
     public function restore(int $id): void
     {

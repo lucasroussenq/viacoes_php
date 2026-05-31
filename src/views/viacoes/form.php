@@ -66,29 +66,29 @@
             >
             <p class="form-help-text">PNG, JPG ou SVG. A imagem será exibida em 160×60 px.</p>
         </div>
-
         <div class="form-group">
-            <label for="status">Status</label>
-            <?php
-            $statusAtual = $old['status'] ?? ($viacao->status ?? 'ativo');
-
-            $isAtivo    = ($statusAtual === 'ativo' || $statusAtual === true || $statusAtual === 1 || $statusAtual === '1');
-            $isDeletado = ($statusAtual === 'deletado' || (!empty($viacao->data_exclusao) && !$isAtivo));
-            $isInativo  = (!$isAtivo && !$isDeletado);
-            ?>
-            <select name="status" id="status" class="search-select" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; background-color: #fff; font-size: 14px; margin-top: 5px;">
-                <option value="ativo" <?= $isAtivo ? 'selected' : '' ?>>
+            <label>Status</label>
+            <div class="radio-group">
+                <label>
+                    <input
+                            type="radio"
+                            name="status"
+                            value="1"
+                            <?= (isset($old['status']) && $old['status'] == '1') || (!isset($old['status']) && isset($viacao->status) && ($viacao->status == 1 || $viacao->status === true)) ? 'checked' : '' ?>
+                    >
                     Ativo
-                </option>
+                </label>
 
-                <option value="inativo" <?= $isInativo ? 'selected' : '' ?>>
+                <label>
+                    <input
+                            type="radio"
+                            name="status"
+                            value="0"
+                            <?= (isset($old['status']) && $old['status'] == '0') || (!isset($old['status']) && isset($viacao->status) && ($viacao->status == 0 || $viacao->status === false)) ? 'checked' : '' ?>
+                    >
                     Inativo
-                </option>
-
-                <option value="deletado" <?= $isDeletado ? 'selected' : '' ?>>
-                    Excluído (Deletado)
-                </option>
-            </select>
+                </label>
+            </div>
         </div>
 
         <button type="submit">Salvar</button>

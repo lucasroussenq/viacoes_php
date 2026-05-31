@@ -104,8 +104,11 @@ $busca = $busca ?? '';
                 <?php foreach ($viacoes as $viacao): ?>
                     <tr>
                         <td><strong><?= (int) $viacao->id ?></strong></td>
-                        <td><?= htmlspecialchars($viacao->nome, ENT_QUOTES, 'UTF-8') ?></td>
-                        <td><?= htmlspecialchars($viacao->cidade, ENT_QUOTES, 'UTF-8') ?></td>
+                        <td>
+                            <a href="/viacoes/<?= (int) ($viacao->id ?? $viacao['id']) ?>" style="text-decoration: none; color: #000000; font-weight: bold;">
+                                <?= htmlspecialchars($viacao->nome ?? $viacao['nome'], ENT_QUOTES, 'UTF-8') ?>
+                            </a>
+                        </td>                        <td><?= htmlspecialchars($viacao->cidade, ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars(substr($viacao?->logo ?? '', 0, 20), ENT_QUOTES, 'UTF-8') ?></td>
                         <td>
                             <a href="<?= htmlspecialchars($viacao->url, ENT_QUOTES, 'UTF-8') ?>"
@@ -114,15 +117,14 @@ $busca = $busca ?? '';
                             </a>
                         </td>
                         <td>
-                            <?php if ($viacao->status): ?>
-                                <span class="badge badge-active">Ativo</span>
-                            <?php elseif (!empty($viacao->data_exclusao)): ?>
+                            <?php if (!empty($viacao->data_exclusao)): ?>
                                 <span class="badge badge-inactive" style="background: #dc3545; color: #ffffff; border-color: #dc3545;">Deletado</span>
+                            <?php elseif ($viacao->status == 1 || $viacao->status === true || $viacao->status === 'ativo'): ?>
+                                <span class="badge badge-active">Ativo</span>
                             <?php else: ?>
                                 <span class="badge badge-inactive">Inativo</span>
                             <?php endif; ?>
                         </td>
-
                         <td class="date-text">
                             <?= htmlspecialchars($viacao->data_criacao, ENT_QUOTES, 'UTF-8') ?>
                         </td>

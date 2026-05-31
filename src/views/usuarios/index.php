@@ -104,28 +104,27 @@ $busca = $busca ?? '';
 
                 <tbody>
                 <?php foreach ($usuarios as $usuario): ?>
-                    <?php
-                    // Regra do TINYINT + data_exclusao para o Usuário
-                    $isDeletado = (!$usuario->status && !empty($usuario->data_exclusao));
-                    $isAtivo    = ($usuario->status === true);
-                    ?>
-                    <tr>
-                        <td><strong><?= (int) $usuario->id ?></strong></td>
-                        <td>
-                            <a href="/usuarios/<?= (int) $usuario->id ?>" style="text-decoration: none; color: #000000; font-weight: bold;">
-                                <?= htmlspecialchars($usuario->nome, ENT_QUOTES, 'UTF-8') ?>
-                            </a>
-                        </td>
-                        <td><?= htmlspecialchars($usuario->email, ENT_QUOTES, 'UTF-8') ?></td>
-                        <td>
-                            <?php if ($isDeletado): ?>
-                                <span class="badge badge-inactive" style="background: #dc3545; color: #ffffff; border-color: #dc3545;">Deletado</span>
-                            <?php elseif ($isAtivo): ?>
-                                <span class="badge badge-active">Ativo</span>
-                            <?php else: ?>
-                                <span class="badge badge-inactive">Inativo</span>
-                            <?php endif; ?>
-                        </td>
+        <?php
+    $isDeletado = !empty($usuario->data_exclusao);
+    $isAtivo    = ($usuario->status == 1 || $usuario->status === true) && !$isDeletado;
+    ?>
+    <tr>
+        <td><strong><?= (int) $usuario->id ?></strong></td>
+        <td>
+            <a href="/usuarios/<?= (int) $usuario->id ?>" style="text-decoration: none; color: #000000; font-weight: bold;">
+                <?= htmlspecialchars($usuario->nome, ENT_QUOTES, 'UTF-8') ?>
+            </a>
+        </td>
+        <td><?= htmlspecialchars($usuario->email, ENT_QUOTES, 'UTF-8') ?></td>
+        <td>
+            <?php if ($isDeletado): ?>
+                <span class="badge badge-inactive" style="background: #dc3545; color: #ffffff; border-color: #dc3545;">Deletado</span>
+            <?php elseif ($isAtivo): ?>
+                <span class="badge badge-active">Ativo</span>
+            <?php else: ?>
+                <span class="badge badge-inactive">Inativo</span>
+            <?php endif; ?>
+        </td>
 
                         <td class="date-text">
                             <?= htmlspecialchars($usuario->data_criacao ?? '', ENT_QUOTES, 'UTF-8') ?>
