@@ -8,11 +8,15 @@ declare(strict_types=1);
  * @var string $tabAtual
  * @var string $filtroUsuario
  * @var string $filtroAlvo
+ * @var int $paginaAtual
+ * @var int $totalPaginas
+ * @var array $filtros
  */
 
 $tabAtual      = $tabAtual      ?? '';
 $filtroUsuario = $filtroUsuario ?? '';
 $filtroAlvo    = $filtroAlvo    ?? '';
+$filtros       = $filtros       ?? [];
 
 if (isset($historico) && is_array($historico)) {
     foreach ($historico as $key => $item) {
@@ -155,7 +159,7 @@ $temFiltro = $filtroUsuario !== '' || $filtroAlvo !== '' || $tabAtual !== '';
             <?php endif; ?>
         </div>
         <?php if ($temFiltro): ?>
-            <p class="search-info"><?= count($historico) ?> registro(s) encontrado(s)</p>
+            <p class="search-info"><?= count($historico) ?> registro(s) listado(s) nesta página</p>
         <?php endif; ?>
     </form>
 
@@ -348,6 +352,28 @@ $temFiltro = $filtroUsuario !== '' || $filtroAlvo !== '' || $tabAtual !== '';
                 <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
-    <?php endif; ?>
+
+            <?php if (isset($totalPaginas) && $totalPaginas > 1): ?>
+                <div class="pagination" style="display: flex; justify-content: center; gap: 8px; margin-top: 20px; padding-bottom: 10px;">
+
+                    <?php if ($paginaAtual > 1): ?>
+                        <a href="?<?= http_build_query(array_merge($filtros, ['pagina' => $paginaAtual - 1])) ?>" style="background: #0d2240; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px;">&laquo; Anterior</a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+                        <?php $ativo = ($i === $paginaAtual); ?>
+                        <a href="?<?= http_build_query(array_merge($filtros, ['pagina' => $i])) ?>"
+                           style="padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; <?= $ativo ? 'background: white; color: #0d2240;' : 'background: rgba(255,255,255,0.2); color: white;' ?>">
+                            <?= $i ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <?php if ($paginaAtual < $totalPaginas): ?>
+                        <a href="?<?= http_build_query(array_merge($filtros, ['pagina' => $paginaAtual + 1])) ?>" style="background: #0d2240; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px;">Próxima &raquo;</a>
+                    <?php endif; ?>
+
+                </div>
+            <?php endif; ?>
+
+        </div> <?php endif; ?>
 </div>

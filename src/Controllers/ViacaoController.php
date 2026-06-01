@@ -86,29 +86,49 @@ final class ViacaoController
     }
 
     /** Lista viações e renderiza a tela principal. */
+    /** Lista viações, calcula a paginação e renderiza a tela principal. */
     public function index(): void
     {
-        $nome   = trim((string) ($_GET['nome']   ?? ''));
-        $cidade = trim((string) ($_GET['cidade'] ?? ''));
-        $url    = trim((string) ($_GET['url']    ?? ''));
-        $status = $_GET['status'] ?? '';
+        $nome     = trim((string) ($_GET['nome']   ?? ''));
+        $cidade   = trim((string) ($_GET['cidade'] ?? ''));
+        $url      = trim((string) ($_GET['url']    ?? ''));
+        $status   = $_GET['status'] ?? '';
         $excluido = $_GET['excluido'] ?? '';
 
+        // Configuração da paginação
+        $paginaAtual = max(1, (int)($_GET['pagina'] ?? 1));
+        $porPagina   = 3; // Altere se desejar alterar o limite de linhas por página
+
+        // Executa a listagem paginada no banco
         $viacoes = $this->viacaoService->listar(
-            $nome   !== '' ? $nome   : null,
-            $cidade !== '' ? $cidade : null,
-            $url    !== '' ? $url    : null,
-            $status !== '' ? $status : null,
-            $excluido !== '' ? $excluido : null
+            nome:     $nome     !== '' ? $nome     : null,
+            cidade:   $cidade   !== '' ? $cidade   : null,
+            url:      $url      !== '' ? $url      : null,
+            status:   $status   !== '' ? $status   : null,
+            excluido: $excluido !== '' ? $excluido : null,
+            pagina:   $paginaAtual,
+            porPagina: $porPagina
         );
 
-        $temFiltro = $nome !== '' || $cidade !== '' || $url !== '' || $status !== '' || $excluido !== '';
+        // Conta o total geral sob as mesmas condições para saber o fim das páginas
+        $totalViacoes = $this->viacaoService->contarTotal(
+            nome:     $nome     !== '' ? $nome     : null,
+            cidade:   $cidade   !== '' ? $cidade   : null,
+            url:      $url      !== '' ? $url      : null,
+            status:   $status   !== '' ? $status   : null,
+            excluido: $excluido !== '' ? $excluido : null
+        );
+
+        $totalPaginas = (int) ceil($totalViacoes / $porPagina);
+        $temFiltro    = $nome !== '' || $cidade !== '' || $url !== '' || $status !== '' || $excluido !== '';
 
         View::render('viacoes/index', [
-            'title'     => 'Viações',
-            'viacoes'   => $viacoes,
-            'temFiltro' => $temFiltro,
-            'filtros'   => compact('nome', 'cidade', 'url', 'status', 'excluido'),
+            'title'        => 'Viações',
+            'viacoes'      => $viacoes,
+            'temFiltro'    => $temFiltro,
+            'filtros'      => compact('nome', 'cidade', 'url', 'status', 'excluido'),
+            'paginaAtual'  => $paginaAtual,
+            'totalPaginas' => $totalPaginas
         ]);
     }
 
@@ -117,13 +137,32 @@ final class ViacaoController
     {
         $filtroUsuario = isset($_GET['usuario']) ? trim((string) $_GET['usuario']) : '';
         $filtroViacao  = isset($_GET['viacao'])  ? trim((string) $_GET['viacao'])  : '';
-        $filtroAcao    = isset($_GET['acao'])     ? trim((string) $_GET['acao'])    : '';
+        $filtroAcao    = isset($_GET['acao'])    ? trim((string) $_GET['acao'])    : '';
+        $tab           = isset($_GET['tab'])     ? trim((string) $_GET['tab'])     : 'viacoes'; // Define a aba ativa
 
+        // configuração da paginação
+        $paginaAtual = max(1, (int)($_GET['pagina'] ?? 1));
+        $porPagina   = 10; // Exibe 10 logs por página
+
+        // captura os dados da página atual
         $historico = $this->historicoService->getHistory([
-            'tab'     => 'viacoes',
-            'usuario' => $filtroUsuario,
-            'alvo'    => $filtroViacao
+            'tab'       => $tab,
+            'usuario'   => $filtroUsuario,
+            'alvo'      => $filtroViacao,
+            'acao'      => $filtroAcao,
+            'pagina'    => $paginaAtual,
+            'porPagina' => $porPagina
         ]);
+
+        // conta o total geral de registros de histórico para os filtros ativos
+        $totalLogs = $this->historicoService->contarTotal([
+            'tab'     => $tab,
+            'usuario' => $filtroUsuario,
+            'alvo'    => $filtroViacao,
+            'acao'    => $filtroAcao
+        ]);
+
+        $totalPaginas = (int) ceil($totalLogs / $porPagina);
 
         View::render('viacoes/historico', [
             'title'         => 'Histórico de viações',
@@ -131,6 +170,10 @@ final class ViacaoController
             'filtroUsuario' => $filtroUsuario,
             'filtroViacao'  => $filtroViacao,
             'filtroAcao'    => $filtroAcao,
+            'tab'           => $tab,
+            'filtros'       => ['usuario' => $filtroUsuario, 'viacao' => $filtroViacao, 'acao' => $filtroAcao, 'tab' => $tab],
+            'paginaAtual'   => $paginaAtual,
+            'totalPaginas'  => $totalPaginas
         ]);
     }
 

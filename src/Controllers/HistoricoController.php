@@ -21,9 +21,7 @@ final class HistoricoController
             session_start();
         }
 
-        // Filtra a aba atual vinda da URL (?tab=viacoes ou ?tab=usuarios)
-        // No seu HistoricoController.php
-        $tabAtual = $_GET['tab'] ?? ''; // Deixe vazio por padrão em vez de 'viacoes'
+        $tabAtual = $_GET['tab'] ?? '';
 
         if (!in_array($tabAtual, ['viacoes', 'usuarios', ''], true)) {
             $tabAtual = '';
@@ -33,19 +31,36 @@ final class HistoricoController
         $filtroUsuario = trim((string)($_GET['usuario'] ?? $_GET['alterado_por'] ?? ''));
         $filtroAlvo    = trim((string)($_GET['alvo'] ?? $_GET['item_afetado'] ?? ''));
 
+
+        $paginaAtual = max(1, (int)($_GET['pagina'] ?? 1));
+        $porPagina   = 10;
+
         $filters = [
+            'tab'       => $tabAtual,
+            'usuario'   => $filtroUsuario,
+            'alvo'      => $filtroAlvo,
+            'pagina'    => $paginaAtual,
+            'porPagina' => $porPagina
+        ];
+
+        $historico = $this->service->getHistory($filters);
+
+        $totalLogs = $this->service->contarTotal([
+            'tab'     => $tabAtual,
+            'usuario' => $filtroUsuario,
+            'alvo'    => $filtroAlvo
+        ]);
+
+        $totalPaginas = (int) ceil($totalLogs / $porPagina);
+
+        $filtros = [
             'tab'     => $tabAtual,
             'usuario' => $filtroUsuario,
             'alvo'    => $filtroAlvo
         ];
 
-        // Solicita os registros unificados ao Service
-        $historico = $this->service->getHistory($filters);
-
-        // Define a variável de título exigida pelo layout do front
         $title = "Histórico Geral";
 
-        // Inclui a sua view original sem alterar uma única linha dela
         require __DIR__ . '/../views/historico/historico.php';
     }
 }

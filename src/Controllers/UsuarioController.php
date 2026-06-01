@@ -53,30 +53,45 @@ final class UsuarioController
     }
 
 
-    /**
-     * Apenas recebe os parâmetros de busca e passa para o Service
-     */
+
     public function index(): void
     {
-        $nome   = trim((string) ($_GET['nome']   ?? ''));
-        $email = trim((string) ($_GET['email'] ?? ''));
-        $status = $_GET['status'] ?? '';
+        $nome     = trim((string) ($_GET['nome']   ?? ''));
+        $email    = trim((string) ($_GET['email']  ?? ''));
+        $status   = $_GET['status'] ?? '';
         $excluido = $_GET['excluido'] ?? '';
 
+        // configuração da paginação
+        $paginaAtual = max(1, (int)($_GET['pagina'] ?? 1));
+        $porPagina   = 3; // Altere se quiser exibir mais ou menos por tela
+
         $usuarios = $this->usuarioService->listar(
-            $nome   !== '' ? $nome   : null,
-            $email !== '' ? $email : null,
-            $status !== '' ? $status : null,
-            $excluido !== '' ? $excluido : null
+            nome:     $nome     !== '' ? $nome     : null,
+            email:    $email    !== '' ? $email    : null,
+            status:   $status   !== '' ? $status   : null,
+            excluido: $excluido !== '' ? $excluido : null,
+            pagina:   $paginaAtual,
+            porPagina: $porPagina
         );
 
-        $temFiltro = $nome !== '' || $email !== '' || $status !== '' || $excluido !== '';
+        // conta o total real baseado nos mesmos filtros para gerar as páginas
+        $totalUsuarios = $this->usuarioService->contarTotal(
+            nome:     $nome     !== '' ? $nome     : null,
+            email:    $email    !== '' ? $email    : null,
+            status:   $status   !== '' ? $status   : null,
+            excluido: $excluido !== '' ? $excluido : null
+        );
+
+        $totalPaginas = (int) ceil($totalUsuarios / $porPagina);
+        $temFiltro    = $nome !== '' || $email !== '' || $status !== '' || $excluido !== '';
 
         View::render('usuarios/index', [
-            'title'     => 'Usuários',
-            'usuarios'   => $usuarios,
-            'temFiltro' => $temFiltro,
-            'filtros'   => compact('nome', 'email', 'status', 'excluido'),
+            'title'        => 'Usuários',
+            'usuarios'     => $usuarios,
+            'temFiltro'    => $temFiltro,
+            'filtros'      => compact('nome', 'email', 'status', 'excluido'),
+            'paginaAtual'  => $paginaAtual,
+            'totalPaginas' => $totalPaginas
         ]);
     }
     public function create(): void

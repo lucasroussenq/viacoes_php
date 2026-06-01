@@ -34,12 +34,16 @@ final class ViacaoService
     }
 
     /** Lista viações com filtros opcionais por nome, cidade, url e status. */
+    /** * Lista viações com filtros opcionais por nome, cidade, url e status, já paginado.
+     */
     public function listar(
-        ?string $nome   = null,
-        ?string $cidade = null,
-        ?string $url    = null,
-        ?string $status = null,
-        ?string $excluido = null
+        ?string $nome     = null,
+        ?string $cidade   = null,
+        ?string $url      = null,
+        ?string $status   = null,
+        ?string $excluido = null,
+        int $pagina       = 1,
+        int $porPagina    = 10
     ): array {
         $where  = [];
         $params = [];
@@ -68,8 +72,19 @@ final class ViacaoService
 
         $whereClause = $where !== [] ? 'WHERE ' . implode(' AND ', $where) : '';
 
-        $stmt = $this->pdo->prepare("SELECT * FROM viacoes.viacoes {$whereClause} ORDER BY id DESC");
-        $stmt->execute($params);
+        $offset = ($pagina - 1) * $porPagina;
+
+        $sql = "SELECT * FROM viacoes.viacoes {$whereClause} ORDER BY id DESC LIMIT :limit OFFSET :offset";
+        $stmt = $this->pdo->prepare($sql);
+
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+
+        $stmt->bindValue(':limit', $porPagina, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
 
         return array_map(
             fn(array $row) => \App\Models\Viacao::fromRow($row),
@@ -77,6 +92,48 @@ final class ViacaoService
         );
     }
 
+    /**
+     * Conta a quantidade total de viações baseado nos mesmos filtros da listagem.
+     */
+    public function contarTotal(
+        ?string $nome     = null,
+        ?string $cidade   = null,
+        ?string $url      = null,
+        ?string $status   = null,
+        ?string $excluido = null
+    ): int {
+        $where  = [];
+        $params = [];
+
+        if ($nome !== null && $nome !== '') {
+            $where[]        = 'nome LIKE :nome';
+            $params['nome'] = '%' . $nome . '%';
+        }
+        if ($cidade !== null && $cidade !== '') {
+            $where[]          = 'cidade LIKE :cidade';
+            $params['cidade'] = '%' . $cidade . '%';
+        }
+        if ($url !== null && $url !== '') {
+            $where[]       = 'url LIKE :url';
+            $params['url'] = '%' . $url . '%';
+        }
+        if ($status !== null && $status !== '') {
+            $where[]          = 'status = :status';
+            $params['status'] = (int) $status;
+        }
+        if ($excluido !== null && $excluido !== '') {
+            $where[]          = 'data_exclusao IS NOT NULL';
+        } else {
+            $where[]          = 'data_exclusao IS NULL';
+        }
+
+        $whereClause = $where !== [] ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM viacoes.viacoes {$whereClause}");
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
     /** @return list<array> */
     public function ativas(): array
     {

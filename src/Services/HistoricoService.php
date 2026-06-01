@@ -19,19 +19,13 @@ final class HistoricoService
 
     /**
      * Insere um registro de auditoria distribuindo os dados nas colunas corretas.
-     * O array $dados deve seguir a estrutura: ['antes' => snapshot|null, 'depois' => snapshot|null]
-     * * @param int $usuarioId ID do admin/sistema que realizou a ação
-     * @param int $entidadeId ID do registro afetado (Viação ou Usuário)
-     * @param string $acao Tipo de ação (Criar, Editar, Deletar...)
-     * @param array $dados Payloads de log
-     * @param string $entidadeTipo Qual tabela foi afetada ('viacoes' ou 'usuarios')
      */
     public function criar(
         int    $usuarioId,
         int    $entidadeId,
         string $acao,
         array  $dados,
-        string $entidadeTipo = 'viacoes' // <-- Parâmetro adicionado para tornar a gravação dinâmica
+        string $entidadeTipo = 'viacoes'
     ): void
     {
         $valorAntigo = null;
@@ -57,7 +51,7 @@ final class HistoricoService
 
         $stmt->execute([
             'entidade_id' => $entidadeId,
-            'entidade_tipo' => $entidadeTipo, // <-- Agora grava o tipo correto enviado por parâmetro
+            'entidade_tipo' => $entidadeTipo,
             'campo_alterado' => $acao,
             'valor_antigo' => $valorAntigo,
             'valor_novo' => $valorNovo,
@@ -72,21 +66,25 @@ final class HistoricoService
         $filtroUsuario = $filters['usuario'] ?? '';
         $filtroAlvo = $filters['alvo'] ?? '';
 
+        $pagina = max(1, (int)($filters['pagina'] ?? 1));
+        $porPagina = max(1, (int)($filters['porPagina'] ?? 10));
+        $offset = ($pagina - 1) * $porPagina;
+
         $sql = "
-        SELECT 
-            h.id,
-            h.entidade_id,
-            h.entidade_tipo,
-            h.campo_alterado,
-            h.valor_antigo,
-            h.valor_novo,
-            h.alterado_por,
-            h.data_alteracao,
-            u.nome AS usuario_nome
-        FROM viacoes.historico_alteracoes h
-        LEFT JOIN viacoes.usuarios u ON u.id = h.alterado_por
-        WHERE 1=1
-    ";
+            SELECT 
+                h.id,
+                h.entidade_id,
+                h.entidade_tipo,
+                h.campo_alterado,
+                h.valor_antigo,
+                h.valor_novo,
+                h.alterado_por,
+                h.data_alteracao,
+                u.nome AS usuario_nome
+            FROM viacoes.historico_alteracoes h
+            LEFT JOIN viacoes.usuarios u ON u.id = h.alterado_por
+            WHERE 1=1
+        ";
 
         $params = [];
 
@@ -101,7 +99,6 @@ final class HistoricoService
         }
 
         if ($filtroAlvo !== '') {
-
             if (ctype_digit((string)$filtroAlvo)) {
                 $sql .= " AND h.entidade_id = :entidade_id_direto";
                 $params['entidade_id_direto'] = (int)$filtroAlvo;
@@ -113,8 +110,18 @@ final class HistoricoService
 
         $sql .= " ORDER BY h.id DESC";
 
+        $sql .= " LIMIT :porPagina OFFSET :offset";
+
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->bindValue('porPagina', $porPagina, PDO::PARAM_INT);
+        $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $historico = [];
@@ -133,6 +140,48 @@ final class HistoricoService
         }
 
         return $historico;
+    }
+
+
+    public function contarTotal(array $filters = []): int
+    {
+        $tabAtual = $filters['tab'] ?? '';
+        $filtroUsuario = $filters['usuario'] ?? '';
+        $filtroAlvo = $filters['alvo'] ?? '';
+
+        $sql = "
+            SELECT COUNT(*) 
+            FROM viacoes.historico_alteracoes h
+            LEFT JOIN viacoes.usuarios u ON u.id = h.alterado_por
+            WHERE 1=1
+        ";
+
+        $params = [];
+
+        if ($tabAtual === 'usuarios' || $tabAtual === 'viacoes') {
+            $sql .= " AND h.entidade_tipo = :entidade_tipo";
+            $params['entidade_tipo'] = $tabAtual;
+        }
+
+        if ($filtroUsuario !== '') {
+            $sql .= " AND u.nome LIKE :filtroUsuario";
+            $params['filtroUsuario'] = '%' . $filtroUsuario . '%';
+        }
+
+        if ($filtroAlvo !== '') {
+            if (ctype_digit((string)$filtroAlvo)) {
+                $sql .= " AND h.entidade_id = :entidade_id_direto";
+                $params['entidade_id_direto'] = (int)$filtroAlvo;
+            } else {
+                $sql .= " AND (h.valor_novo LIKE :filtroAlvo OR h.valor_antigo LIKE :filtroAlvo)";
+                $params['filtroAlvo'] = '%' . $filtroAlvo . '%';
+            }
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
     }
 
     public function listar(?string $usuario = null, ?string $viacao = null, ?string $acao = null): array
@@ -176,6 +225,4 @@ final class HistoricoService
         $stmt->execute($params);
         return array_map(fn(array $row) => Historico::fromRow($row), $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
-
-
 }

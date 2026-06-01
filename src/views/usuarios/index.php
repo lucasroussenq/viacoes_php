@@ -49,10 +49,10 @@ $busca = $busca ?? '';
                    placeholder="Nome do usuário…"
                    value="<?= htmlspecialchars($filtros['nome'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
-            <input type="search" name="e-mail"
+            <input type="search" name="email"
                    class="search-input"
                    placeholder="E-mail…"
-                   value="<?= htmlspecialchars($filtros['e-mail'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                   value="<?= htmlspecialchars($filtros['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
             <select name="status" class="search-select">
                 <option value="">Todos os status</option>
@@ -154,6 +154,28 @@ $busca = $busca ?? '';
                 <?php endforeach; ?>
                 </tbody>
             </table>
+
+            <?php if (isset($totalPaginas) && $totalPaginas > 1): ?>
+    <div class="pagination" style="display: flex; justify-content: center; gap: 8px; margin-top: 20px; padding-bottom: 10px;">
+
+        <?php if ($paginaAtual > 1): ?>
+            <a href="?<?= http_build_query(array_merge($filtros, ['pagina' => $paginaAtual - 1])) ?>" style="background: #0d2240; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px;">&laquo; Anterior</a>
+        <?php endif; ?>
+
+        <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+            <?php $ativo = ($i === $paginaAtual); ?>
+            <a href="?<?= http_build_query(array_merge($filtros, ['pagina' => $i])) ?>"
+               style="padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; <?= $ativo ? 'background: white; color: #0d2240;' : 'background: rgba(255,255,255,0.2); color: white;' ?>">
+                <?= $i ?>
+            </a>
+        <?php endfor; ?>
+
+        <?php if ($paginaAtual < $totalPaginas): ?>
+            <a href="?<?= http_build_query(array_merge($filtros, ['pagina' => $paginaAtual + 1])) ?>" style="background: #0d2240; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px;">Próxima &raquo;</a>
+        <?php endif; ?>
+
+    </div>
+<?php endif; ?>
         </div>
 </main>
     <?php endif; ?>

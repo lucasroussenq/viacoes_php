@@ -61,14 +61,15 @@ final class UsuarioService
     }
 
     public function listar(
-        ?string $nome   = null,
-        ?string $email  = null,
-        ?string $status = null,
-        ?string $excluido = null
+        ?string $nome     = null,
+        ?string $email    = null,
+        ?string $status   = null,
+        ?string $excluido = null,
+        int $pagina       = 1,
+        int $porPagina    = 10
     ): array {
         $where  = [];
         $params = [];
-
 
         if ($nome !== null && $nome !== '') {
             $where[]        = 'nome LIKE :nome';
@@ -90,8 +91,19 @@ final class UsuarioService
 
         $whereClause = $where !== [] ? 'WHERE ' . implode(' AND ', $where) : '';
 
-        $stmt = $this->pdo->prepare("SELECT * FROM viacoes.usuarios {$whereClause} ORDER BY id DESC");
-        $stmt->execute($params);
+        $offset = ($pagina - 1) * $porPagina;
+
+        $sql = "SELECT * FROM viacoes.usuarios {$whereClause} ORDER BY id DESC LIMIT :limit OFFSET :offset";
+        $stmt = $this->pdo->prepare($sql);
+
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+
+        $stmt->bindValue(':limit', $porPagina, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
 
         return array_map(
             fn(array $row) => \App\Models\Usuario::fromRow($row),
@@ -99,6 +111,43 @@ final class UsuarioService
         );
     }
 
+    /**
+     * Conta a quantidade total de usuários baseado nos mesmos filtros da listagem.
+     */
+    public function contarTotal(
+        ?string $nome     = null,
+        ?string $email    = null,
+        ?string $status   = null,
+        ?string $excluido = null
+    ): int {
+        $where  = [];
+        $params = [];
+
+        if ($nome !== null && $nome !== '') {
+            $where[]        = 'nome LIKE :nome';
+            $params['nome'] = '%' . $nome . '%';
+        }
+        if ($email !== null && $email !== '') {
+            $where[]         = 'email LIKE :email';
+            $params['email'] = '%' . $email . '%';
+        }
+        if ($status !== null && $status !== '') {
+            $where[]          = 'status = :status';
+            $params['status'] = (int) $status;
+        }
+        if ($excluido !== null && $excluido !== '') {
+            $where[]          = 'data_exclusao IS NOT NULL';
+        } else {
+            $where[]          = 'data_exclusao IS NULL';
+        }
+
+        $whereClause = $where !== [] ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM viacoes.usuarios {$whereClause}");
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
 
     /** buscar um único Usuário pelo ID */
     public function find(int $id): ?\App\Models\Usuario
