@@ -65,10 +65,8 @@ final class ViacaoController
     }
 
     /** Retorna o status tratado puramente como string, levando em conta a data de exclusão */
-    /** Retorna o status tratado puramente como string, levando em conta a data de exclusão */
     private function snapshot(Viacao $v): array
     {
-        // Se a data de exclusão NÃO estiver vazia, o status obrigatoriamente é deletado
         if (!empty($v->data_exclusao)) {
             $statusString = 'deletado';
         } else {
@@ -86,7 +84,6 @@ final class ViacaoController
     }
 
     /** Lista viações e renderiza a tela principal. */
-    /** Lista viações, calcula a paginação e renderiza a tela principal. */
     public function index(): void
     {
         $nome     = trim((string) ($_GET['nome']   ?? ''));
@@ -95,11 +92,10 @@ final class ViacaoController
         $status   = $_GET['status'] ?? '';
         $excluido = $_GET['excluido'] ?? '';
 
-        // Configuração da paginação
+        // configuração da paginação
         $paginaAtual = max(1, (int)($_GET['pagina'] ?? 1));
-        $porPagina   = 3; // Altere se desejar alterar o limite de linhas por página
+        $porPagina   = 3;
 
-        // Executa a listagem paginada no banco
         $viacoes = $this->viacaoService->listar(
             nome:     $nome     !== '' ? $nome     : null,
             cidade:   $cidade   !== '' ? $cidade   : null,
@@ -110,7 +106,6 @@ final class ViacaoController
             porPagina: $porPagina
         );
 
-        // Conta o total geral sob as mesmas condições para saber o fim das páginas
         $totalViacoes = $this->viacaoService->contarTotal(
             nome:     $nome     !== '' ? $nome     : null,
             cidade:   $cidade   !== '' ? $cidade   : null,
@@ -253,7 +248,6 @@ final class ViacaoController
     }
 
     /** Processa o PUT de atualização gerindo os status numéricos e a data de exclusão */
-    /** Processa o PUT de atualização gerindo os status numéricos e a data de exclusão */
     public function update(int $id): void
     {
         $viacaoEditar = $this->viacaoService->find($id);
@@ -270,7 +264,6 @@ final class ViacaoController
         $url        = trim((string) ($_POST['url']    ?? ''));
         $cidade     = trim((string) ($_POST['cidade'] ?? ''));
 
-        // Recebe o valor do rádio ('1', '0' ou 'deletado')
         $statusForm = $_POST['status'] ?? '1';
 
         $status = ($statusForm === '1' || $statusForm === 'ativo') ? 1 : 0;
@@ -330,5 +323,82 @@ final class ViacaoController
             $errors[] = 'O nome da viação deve ter no máximo 255 caracteres.';
         }
         return $errors;
+    }
+
+
+    public function restore(int $id): void
+    {
+        $viacao = $this->viacaoService->find($id);
+
+        if ($viacao === null) {
+            http_response_code(404);
+            echo 'Viação não encontrada.';
+            return;
+        }
+
+        // 1. Grava no histórico a ação de RESTORE apontando quem fez (nicolas)
+        // Passamos o estado atual no 'depois' para registrar como ela voltou a ficar ativa
+        $this->historicoService->criar(
+            usuarioId:    $this->getAdminId(),
+            entidadeId:   $id,
+            acao:         'RESTORE',
+            dados: [
+                'antes'  => null,
+                'depois' => $this->snapshot($viacao)
+            ],
+            entidadeTipo: 'viacoes'
+        );
+
+        // 2. Executa a restauração no Service (limpando a data_exclusao e reativando o status)
+        $this->viacaoService->restore($id);
+
+        // 3. Define a mensagem de sucesso e redireciona
+        View::flash('success', 'Viação restaurada com sucesso.');
+        View::redirect('/viacoes');
+    }
+
+    /**
+     * Executa a exclusão lógica de uma viação e grava a auditoria.
+     */
+    public function destroy(int $id): void
+    {
+        $viacao = $this->viacaoService->find($id);
+
+        if ($viacao === null) {
+            http_response_code(404);
+            echo 'Viação não encontrada.';
+            return;
+        }
+
+        $snapshotAntes = $this->snapshot($viacao);
+
+        $dataExclusao = (new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')))->format('Y-m-d H:i:s');
+
+
+        $this->viacaoService->update(
+            id: $id,
+            nome: $viacao->nome,
+            cidade: $viacao->cidade,
+            status: 0,
+            url: $viacao->url,
+            file: null,
+            dataExclusao: $dataExclusao
+        );
+
+        $viacaoAtualizada = $this->viacaoService->find($id);
+
+        $this->historicoService->criar(
+            usuarioId:    $this->getAdminId(),
+            entidadeId:   $id,
+            acao:         'DELETE',
+            dados: [
+                'antes'  => $snapshotAntes,
+                'depois' => $viacaoAtualizada !== null ? $this->snapshot($viacaoAtualizada) : null,
+            ],
+            entidadeTipo: 'viacoes'
+        );
+
+        View::flash('success', 'Viação excluída com sucesso.');
+        View::redirect('/viacoes');
     }
 }

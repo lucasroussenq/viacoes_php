@@ -27,7 +27,7 @@ final class HistoricoController
             $tabAtual = '';
         }
 
-        // Normaliza os filtros vindos dos campos de input da barra de pesquisa
+        // normaliza os filtros vindos dos campos de input da barra de pesquisa
         $filtroUsuario = trim((string)($_GET['usuario'] ?? $_GET['alterado_por'] ?? ''));
         $filtroAlvo    = trim((string)($_GET['alvo'] ?? $_GET['item_afetado'] ?? ''));
 
@@ -61,6 +61,6 @@ final class HistoricoController
 
         $title = "Histórico Geral";
 
-        require __DIR__ . '/../views/historico/historico.php';
+        require __DIR__ . '/../views/historico/index.php';
     }
 }

@@ -5,9 +5,8 @@ declare(strict_types=1);
 /** @var list<string> $errors */
 /** @var array $old */
 
-// Definições necessárias para o form.php não dar "Undefined variable" no Create
 $action = "/viacoes";
-$method = "POST"; // Cadastro comum usa POST puro
+$method = "POST";
 $old    = $old ?? [];
 ?>
 

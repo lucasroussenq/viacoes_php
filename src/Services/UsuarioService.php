@@ -152,7 +152,6 @@ final class UsuarioService
     /** buscar um único Usuário pelo ID */
     public function find(int $id): ?\App\Models\Usuario
     {
-        // Remova travas como "AND status = 1" ou "AND data_exclusao IS NULL"
         $stmt = $this->pdo->prepare('
         SELECT id, nome, email, senha, status, data_criacao, data_exclusao 
         FROM viacoes.usuarios 
@@ -170,7 +169,6 @@ final class UsuarioService
     }
 
 
-    /** ATUALIZAR USUÁRIO */
     public function update(
         int $id,
         string $nome,
@@ -298,7 +296,6 @@ final class UsuarioService
         $stmt = $this->pdo->prepare("UPDATE viacoes.usuarios SET data_exclusao = NULL WHERE id = :id");
         $stmt->execute(['id' => $id]);
 
-        // Captura o estado pós-restauração
         $stmtNew = $this->pdo->prepare("SELECT nome, email, senha, status FROM viacoes.usuarios WHERE id = :id");
         $stmtNew->execute(['id' => $id]);
     }

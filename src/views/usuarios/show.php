@@ -221,7 +221,6 @@
                                         </div>
                                     </div>
                                 <?php else: ?>
-                                    <span class="msg-empty-log">Nenhum campo monitorado foi alterado</span>
                                 <?php endif; ?>
                             <?php endif; ?>
                         </td>

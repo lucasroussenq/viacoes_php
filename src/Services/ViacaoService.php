@@ -34,8 +34,6 @@ final class ViacaoService
     }
 
     /** Lista viações com filtros opcionais por nome, cidade, url e status. */
-    /** * Lista viações com filtros opcionais por nome, cidade, url e status, já paginado.
-     */
     public function listar(
         ?string $nome     = null,
         ?string $cidade   = null,

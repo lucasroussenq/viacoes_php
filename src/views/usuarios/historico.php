@@ -16,14 +16,12 @@ $filtroUsuario = $filtroUsuario ?? '';
 $filtroAlvo    = $filtroAlvo    ?? '';
 $filtroAcao    = $filtroAcao    ?? '';
 
-// Mapa de rótulos para exibição amigável dos campos de usuários
 $rotulos = [
     'nome'   => 'Nome',
     'email'  => 'E-mail',
     'status' => 'Status',
 ];
 
-// Formata um valor de campo para exibição legível
 $formatar = static function (string $campo, mixed $valor): string {
     if ($valor === null) {
         return '—';
@@ -41,7 +39,6 @@ $formatar = static function (string $campo, mixed $valor): string {
     return $str !== '' ? htmlspecialchars($str, ENT_QUOTES, 'UTF-8') : '—';
 };
 
-// Badge de cor por ação
 $badgeAcao = static function (string $acao): string {
     $map = [
         'criar'   => 'badge badge-active',
@@ -132,11 +129,9 @@ $temFiltro = $filtroUsuario !== '' || $filtroAlvo !== '' || $filtroAcao !== '';
                 <?php foreach ($historico as $h): ?>
 
                     <?php
-                    // Extrai os snapshots do campo dados
-                    $antes  = $h->dados['antes']  ?? null;   // array ou null
-                    $depois = $h->dados['depois'] ?? null;   // array ou null
+                    $antes  = $h->dados['antes']  ?? null;
+                    $depois = $h->dados['depois'] ?? null;
 
-                    // Calcula quais campos realmente mudaram
                     $camposAlterados = [];
                     if ($antes !== null && $depois !== null) {
                         foreach ($rotulos as $campo => $_) {

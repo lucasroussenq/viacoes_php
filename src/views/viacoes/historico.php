@@ -16,7 +16,6 @@ $filtroUsuario = $filtroUsuario ?? '';
 $filtroViacao  = $filtroViacao  ?? '';
 $filtroAcao    = $filtroAcao    ?? '';
 
-// Mapa de rótulos para exibição amigável dos campos
 $rotulos = [
         'nome'   => 'Nome',
         'url'    => 'Site',
@@ -25,7 +24,6 @@ $rotulos = [
         'logo'   => 'Logo',
 ];
 
-// Formata um valor de campo para exibição legível
 $formatar = static function (string $campo, mixed $valor): string {
     if ($valor === null) {
         return '—';
@@ -40,7 +38,6 @@ $formatar = static function (string $campo, mixed $valor): string {
     return $str !== '' ? htmlspecialchars($str, ENT_QUOTES, 'UTF-8') : '—';
 };
 
-// Badge de cor por ação
 $badgeAcao = static function (string $acao): string {
     $map = [
             'criar'   => 'badge badge-active',
@@ -132,11 +129,10 @@ $temFiltro = $filtroUsuario !== '' || $filtroViacao !== '' || $filtroAcao !== ''
                 <?php foreach ($historico as $h): ?>
 
                     <?php
-                    // Extrai os snapshots do campo dados
+                    // extrai os snapshots do campo dados
                     $antes  = $h->dados['antes']  ?? null;   // array ou null
                     $depois = $h->dados['depois'] ?? null;   // array ou null
 
-                    // Para edição: calcula quais campos realmente mudaram
                     $camposAlterados = [];
                     if ($antes !== null && $depois !== null) {
                         foreach ($rotulos as $campo => $_) {
@@ -167,7 +163,6 @@ $temFiltro = $filtroUsuario !== '' || $filtroViacao !== '' || $filtroAcao !== ''
                             <div class="diff-grid">
 
                                 <?php if ($h->acao === 'criar' && $depois !== null): ?>
-                                    <!-- CRIAÇÃO: só exibe "depois" (estado inicial) -->
                                     <div class="diff-col unico">
                                         <h4>Dados iniciais</h4>
                                         <table>
@@ -181,7 +176,6 @@ $temFiltro = $filtroUsuario !== '' || $filtroViacao !== '' || $filtroAcao !== ''
                                     </div>
 
                                 <?php elseif ($h->acao === 'deletar' && $antes !== null): ?>
-                                    <!-- DELEÇÃO: só exibe "antes" (o que foi removido) -->
                                     <div class="diff-col antes">
                                         <h4>Dados removidos</h4>
                                         <table>
@@ -195,7 +189,6 @@ $temFiltro = $filtroUsuario !== '' || $filtroViacao !== '' || $filtroAcao !== ''
                                     </div>
 
                                 <?php elseif ($h->acao === 'editar' && $antes !== null && $depois !== null): ?>
-                                    <!-- EDIÇÃO: exibe antes e depois lado a lado, destacando o que mudou -->
                                     <div class="diff-col antes">
                                         <h4>Antes</h4>
                                         <table>
@@ -225,7 +218,6 @@ $temFiltro = $filtroUsuario !== '' || $filtroViacao !== '' || $filtroAcao !== ''
                                     <?php endif; ?>
 
                                 <?php else: ?>
-                                    <!-- Fallback para registros antigos sem estrutura antes/depois -->
                                     <div class="diff-col unico">
                                         <pre class="json"><?=
                                             htmlspecialchars(

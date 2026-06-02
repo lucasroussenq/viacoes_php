@@ -20,8 +20,17 @@ final class UsuarioController
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+        $this->verificarLogin();
         $this->usuarioService = $usuarioService ?? new UsuarioService();
         $this->historicoService = new HistoricoService();
+    }
+
+    private function verificarLogin(): void
+    {
+        if (empty($_SESSION['user_id']) && empty($_SESSION['usuario_id'])) {
+            View::redirect('/login');
+            exit;
+        }
     }
 
 
@@ -61,9 +70,8 @@ final class UsuarioController
         $status   = $_GET['status'] ?? '';
         $excluido = $_GET['excluido'] ?? '';
 
-        // configuração da paginação
         $paginaAtual = max(1, (int)($_GET['pagina'] ?? 1));
-        $porPagina   = 3; // Altere se quiser exibir mais ou menos por tela
+        $porPagina   = 3;
 
         $usuarios = $this->usuarioService->listar(
             nome:     $nome     !== '' ? $nome     : null,
@@ -74,7 +82,6 @@ final class UsuarioController
             porPagina: $porPagina
         );
 
-        // conta o total real baseado nos mesmos filtros para gerar as páginas
         $totalUsuarios = $this->usuarioService->contarTotal(
             nome:     $nome     !== '' ? $nome     : null,
             email:    $email    !== '' ? $email    : null,
@@ -103,8 +110,8 @@ final class UsuarioController
 
     public function store(): void
     {
-        $nome   = $_POST['nome'] ?? '';
-        $email  = $_POST['email'] ?? '';
+        $nome   = trim((string)($_POST['nome'] ?? ''));
+        $email  = trim((string)($_POST['email'] ?? ''));
         $senha  = $_POST['senha'] ?? '';
         $status = $_POST['status'] ?? 'ativo';
 
@@ -116,6 +123,22 @@ final class UsuarioController
         }
 
         $this->usuarioService->criar($nome, $email, $senha, $status);
+
+        $usuariosEncontrados = $this->usuarioService->listar(email: $email);
+        $usuarioCriado = !empty($usuariosEncontrados) ? $usuariosEncontrados[0] : null;
+
+        if ($usuarioCriado !== null) {
+            $this->historicoService->criar(
+                usuarioId:    $this->getAdminId(),
+                entidadeId:   (int)$usuarioCriado->id,
+                acao:         'CREATE',
+                dados: [
+                    'antes'  => null,
+                    'depois' => $this->snapshot($usuarioCriado),
+                ],
+                entidadeTipo: 'usuarios'
+            );
+        }
 
         header('Location: /usuarios');
         exit;
@@ -137,13 +160,20 @@ final class UsuarioController
 
     public function update(int $id): void
     {
+        $usuarioEditar = $this->usuarioService->find($id);
+
+        if (!$usuarioEditar) {
+            header('Location: /usuarios');
+            exit;
+        }
+
+        $snapshotAntes = $this->snapshot($usuarioEditar);
+
         $nome  = trim((string)($_POST['nome'] ?? ''));
         $email = trim((string)($_POST['email'] ?? ''));
-        $senha = $_POST['senha'] ?? ''; // Mantido aqui caso venha de outra rota, mas sumirá do form.php
+        $senha = $_POST['senha'] ?? '';
 
-        // Recebe o valor do rádio ('1', '0' ou 'deletado')
         $statusForm = $_POST['status'] ?? '1';
-
         $status = ($statusForm === '1' || $statusForm === 'ativo') ? 1 : 0;
 
         $dataExclusao = null;
@@ -152,15 +182,8 @@ final class UsuarioController
         }
 
         if ($nome === '' || $email === '') {
-            $usuario = $this->usuarioService->find($id);
             $errors  = ['Nome e E-mail não podem ficar vazios.'];
-
-            $old = [
-                'nome'   => $nome,
-                'email'  => $email,
-                'status' => $statusForm
-            ];
-
+            $old = ['nome' => $nome, 'email' => $email, 'status' => $statusForm];
             require __DIR__ . '/../views/usuarios/edit.php';
             return;
         }
@@ -172,6 +195,19 @@ final class UsuarioController
             status: $status,
             novaSenha: ($senha !== '' ? $senha : null),
             dataExclusao: $dataExclusao
+        );
+
+        $usuarioAtualizado = $this->usuarioService->find($id);
+
+        $this->historicoService->criar(
+            usuarioId:    $this->getAdminId(),
+            entidadeId:   $id,
+            acao:         'UPDATE',
+            dados: [
+                'antes'  => $snapshotAntes,
+                'depois' => $usuarioAtualizado !== null ? $this->snapshot($usuarioAtualizado) : null,
+            ],
+            entidadeTipo: 'usuarios'
         );
 
         header('Location: /usuarios');
