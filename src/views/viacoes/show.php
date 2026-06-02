@@ -58,7 +58,7 @@
         <?php endif; ?>
         <div>
             <p style="margin-bottom: 8px;"><strong>Nome da Marca / Empresa:</strong> <?= htmlspecialchars($viacao->nome, ENT_QUOTES, 'UTF-8') ?></p>
-            <p style="margin-bottom: 8px;"><strong>Cidade Base:</strong> <?= htmlspecialchars($viacao->cidade, ENT_QUOTES, 'UTF-8') ?></p>
+            <p style="margin-bottom: 8px;"><strong>Cidade:</strong> <?= htmlspecialchars($viacao->cidade, ENT_QUOTES, 'UTF-8') ?></p>
             <p style="margin-bottom: 8px;"><strong>Site Oficial:</strong> <a href="<?= htmlspecialchars($viacao->url, ENT_QUOTES, 'UTF-8') ?>" target="_blank" style="color: #0056b3; font-weight: bold;"><?= htmlspecialchars($viacao->url, ENT_QUOTES, 'UTF-8') ?></a></p>
             <p style="margin-bottom: 0;"><strong>Status:</strong>
                 <?php if (!empty($viacao->data_exclusao)): ?>
@@ -70,6 +70,7 @@
                     <span class="badge" style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 4px;">Inativo</span>
                 <?php endif; ?>
             </p>
+            <p style="margin-bottom: 0;"><strong>Cadastrado em:</strong> <?= htmlspecialchars($viacao->data_criacao ?? '', ENT_QUOTES, 'UTF-8') ?></p>
         </div>
     </div>
 
@@ -234,7 +235,6 @@
                                     </div>
                                 </div>
                             <?php else: ?>
-                                <span style="color: #999; font-style: italic;">Nenhum campo monitorado foi alterado</span>
                             <?php endif; ?>
                         </td>
                     </tr>
